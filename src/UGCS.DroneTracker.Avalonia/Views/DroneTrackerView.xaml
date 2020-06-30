@@ -1,0 +1,283 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"			 
+			 xmlns:iac="clr-namespace:Avalonia.Xaml.Interactions.Custom;assembly=Avalonia.Xaml.Interactions.Custom"
+			 xmlns:vm="clr-namespace:UGCS.DroneTracker.Avalonia.ViewModels;assembly=DroneTracker-AV"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="450"
+             xmlns:views="clr-namespace:UGCS.DroneTracker.Avalonia.Views"
+			 x:Class="UGCS.DroneTracker.Avalonia.Views.DroneTrackerView">
+	<UserControl.Resources>
+		<views:GeodeticLocationConverter x:Key="GeodeticLocationConverter" />
+		<views:RadiansToDegreesLocationConverter x:Key="RadiansToDegreesLocationConverter" />
+	</UserControl.Resources>
+	
+	<UserControl.Styles>
+		<Style Selector="Button.IconButton, ToggleButton.IconButton">
+			<Setter Property="HorizontalAlignment" Value="Center" />
+			<Setter Property="HorizontalContentAlignment" Value="Center" />
+			<Setter Property="VerticalContentAlignment" Value="Center" />
+			<Setter Property="Margin" Value="0" />
+			<Setter Property="Padding" Value="5" />
+			<Setter Property="BorderThickness" Value="0" />
+			<Setter Property="Background" Value="Transparent" />
+		</Style>
+
+		<Style Selector="Button.IconButton > Path, ToggleButton.IconButton > Path">
+			<Setter Property="HorizontalAlignment" Value="Stretch" />
+			<Setter Property="VerticalAlignment" Value="Stretch" />
+			<Setter Property="Stretch" Value="Uniform" />
+			<Setter Property="Width" Value="56" />
+			<Setter Property="Height" Value="56" />
+			<Setter Property="Margin" Value="0" />
+			
+			<Setter Property="Fill" Value="LightGray" />
+		</Style>
+
+	</UserControl.Styles>
+	
+	<DockPanel LastChildFill="False" Margin="10">
+		
+		<Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*" Margin="0 0 0 10"
+			  HorizontalAlignment="Stretch" VerticalAlignment="Center" >
+			<views:ConnectionStatusView DataContext="{Binding ConnectionStatusViewModel}" 
+										Grid.Column="0"  VerticalAlignment="Stretch" />
+			<Button
+				Command="{Binding GoSettings}" 
+				Classes="IconButton"
+				Margin="10 0 10 0" 
+				VerticalAlignment="Center" 
+				HorizontalAlignment="Right"
+				Grid.Column="1"
+				ToolTip.Tip="Settings"
+				>
+				<Path Width="24" Height="24" Data="M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8M12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12A2,2 0 0,0 12,10M10,22C9.75,22 9.54,21.82 9.5,21.58L9.13,18.93C8.5,18.68 7.96,18.34 7.44,17.94L4.95,18.95C4.73,19.03 4.46,18.95 4.34,18.73L2.34,15.27C2.21,15.05 2.27,14.78 2.46,14.63L4.57,12.97L4.5,12L4.57,11L2.46,9.37C2.27,9.22 2.21,8.95 2.34,8.73L4.34,5.27C4.46,5.05 4.73,4.96 4.95,5.05L7.44,6.05C7.96,5.66 8.5,5.32 9.13,5.07L9.5,2.42C9.54,2.18 9.75,2 10,2H14C14.25,2 14.46,2.18 14.5,2.42L14.87,5.07C15.5,5.32 16.04,5.66 16.56,6.05L19.05,5.05C19.27,4.96 19.54,5.05 19.66,5.27L21.66,8.73C21.79,8.95 21.73,9.22 21.54,9.37L19.43,11L19.5,12L19.43,13L21.54,14.63C21.73,14.78 21.79,15.05 21.66,15.27L19.66,18.73C19.54,18.95 19.27,19.04 19.05,18.95L16.56,17.95C16.04,18.34 15.5,18.68 14.87,18.93L14.5,21.58C14.46,21.82 14.25,22 14,22H10M11.25,4L10.88,6.61C9.68,6.86 8.62,7.5 7.85,8.39L5.44,7.35L4.69,8.65L6.8,10.2C6.4,11.37 6.4,12.64 6.8,13.8L4.68,15.36L5.43,16.66L7.86,15.62C8.63,16.5 9.68,17.14 10.87,17.38L11.24,20H12.76L13.13,17.39C14.32,17.14 15.37,16.5 16.14,15.62L18.57,16.66L19.32,15.36L17.2,13.81C17.6,12.64 17.6,11.37 17.2,10.2L19.31,8.65L18.56,7.35L16.15,8.39C15.38,7.5 14.32,6.86 13.12,6.62L12.75,4H11.25Z" />
+			</Button>
+		</Grid>
+
+		
+
+
+		<DockPanel DockPanel.Dock="Top" VerticalAlignment="Center" HorizontalAlignment="Stretch" LastChildFill="True">
+			<TextBlock Text="Drone:" VerticalAlignment="Center" DockPanel.Dock="Left" />
+			<ComboBox Items="{Binding Vehicles}" SelectedItem="{Binding SelectedVehicle}" DockPanel.Dock="Top" 
+					  VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="10 0 10 0" Height="32" >
+				<ComboBox.ItemTemplate>
+					<DataTemplate>
+						<TextBlock Text="{Binding Name}" />
+					</DataTemplate>
+				</ComboBox.ItemTemplate>
+			</ComboBox>
+		</DockPanel>
+
+
+		<StackPanel Classes="HR" DockPanel.Dock="Top">
+			<Border />
+			<TextBlock Text="Initial setup" />
+		</StackPanel>
+
+		<Grid DockPanel.Dock="Top" ColumnDefinitions="Auto, *, Auto" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto" 
+			  Margin="10 0 0 0">
+
+			
+			<TextBlock Text="Platform latitude" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0" />
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="0" Margin="10 0 0 0"
+					 Text="{Binding InitialPlatformLatitude}"
+					 IsEnabled="{Binding !IsTrackingEnabled}"
+					 />
+			<Button Classes="IconButton" Grid.Column="2" Grid.Row="0"
+					Command="{Binding SetPTZInitialLocationFromDroneCommand}" ToolTip.Tip="Get platform Lat/Loin/Alt from selected drone"
+					Margin="0 0 0 0" HorizontalAlignment="Center" VerticalAlignment="Center">
+				<Path Width="24" Height="24"
+					Data="M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8M3.05,13H1V11H3.05C3.5,6.83 6.83,3.5 11,3.05V1H13V3.05C17.17,3.5 20.5,6.83 20.95,11H23V13H20.95C20.5,17.17 17.17,20.5 13,20.95V23H11V20.95C6.83,20.5 3.5,17.17 3.05,13M12,5A7,7 0 0,0 5,12A7,7 0 0,0 12,19A7,7 0 0,0 19,12A7,7 0 0,0 12,5Z"
+					/>
+			</Button>
+
+
+			<TextBlock Text="Platform longitude" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" Margin="0 5 0 0" />
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Margin="10 5 0 0"
+				Text="{Binding InitialPlatformLongitude}"
+				IsEnabled="{Binding !IsTrackingEnabled}" />
+
+			<TextBlock Text="Platform altitude AMSL" VerticalAlignment="Center" Grid.Column="0" Grid.Row="2" Margin="0 5 0 0" />
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="2" Margin="10 5 0 0"
+					 Text="{Binding InitialPlatformAltitude}"
+					 IsEnabled="{Binding !IsTrackingEnabled}"
+					 />
+
+
+			<TextBlock Text="North direction" VerticalAlignment="Center" Grid.Column="0" Grid.Row="3" Margin="0 5 0 0"/>
+			<TextBox VerticalAlignment="Center"  Text="{Binding InitialNorthDirection}"
+					 Grid.Column="1" Grid.Row="3"
+					 IsEnabled="{Binding !IsTrackingEnabled}"
+					 Margin="10 5 0 0" HorizontalAlignment="Stretch" />
+			<Button Classes="IconButton" Grid.Column="2" Grid.Row="3"
+					
+					Command="{Binding SetNorthFromCurrentCommand}" ToolTip.Tip="Get from platform Pan position"
+					Margin="0 5 0 0" HorizontalAlignment="Center" VerticalAlignment="Center">
+				<Path Width="24" Height="24"
+					Data="M7,17L10.2,10.2L17,7L13.8,13.8L7,17M12,11.1A0.9,0.9 0 0,0 11.1,12A0.9,0.9 0 0,0 12,12.9A0.9,0.9 0 0,0 12.9,12A0.9,0.9 0 0,0 12,11.1M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z"
+						/>
+			</Button>
+
+
+			<TextBlock Text="Platform tilt" VerticalAlignment="Center" Grid.Column="0" Grid.Row="4" Margin="0 5 0 0"/>
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="4" Margin="10 5 0 0"
+					 Text="{Binding InitialPlatformTilt}" 
+					 IsEnabled="{Binding !IsTrackingEnabled}"
+					 />
+
+			<!--IsEnabled="{Binding !IsTrackingEnabled}"-->
+			<TextBlock Text="Platform roll" VerticalAlignment="Center" Grid.Column="0" Grid.Row="5" Margin="0 5 0 0"/>
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="5" 
+					 Text="{Binding InitialPlatformRoll}" Margin="10 5 0 0"
+					 IsEnabled="False"
+				 
+					 />
+
+
+		</Grid>
+
+		<StackPanel Classes="HR" DockPanel.Dock="Top">
+			<Border />
+			<TextBlock Text="Tracking" />
+		</StackPanel>
+
+
+		<StackPanel DockPanel.Dock="Top" HorizontalAlignment="Stretch" Margin="0 0 0 0">
+			<Grid ColumnDefinitions="*,*" Margin="0">
+				<Button Content="Start" Command="{Binding StartTrackCommand}" Grid.Column="0" 
+						Classes="IconButton" Margin="0 0 10 0" HorizontalAlignment="Right"
+						>
+					<!--CC120F #83CC2F-->
+					<Path Fill="LightGray" 
+						  Data="M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
+                </Button>
+				<Button Content="Stop" Command="{Binding StopTrackCommand}" Grid.Column="1" 
+						Margin="10 0 0 0" Classes="IconButton" HorizontalAlignment="Left" >
+					<!--0089CF-->
+					<Path Fill="#CC120F" 
+						  Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M9,9H15V15H9" />
+                </Button>
+			</Grid>
+		</StackPanel>
+
+		<StackPanel Classes="HR" DockPanel.Dock="Top">
+			<Border />
+			<TextBlock Text="Drone location" />
+		</StackPanel>
+
+
+		<Grid DockPanel.Dock="Top" ColumnDefinitions="*,*, 34" RowDefinitions="Auto, Auto, Auto" 
+			  Margin="10 0 0 0">
+
+			<TextBlock Text="Latitude:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0" Margin="0 5 0 0"/>
+			<!--, Converter={StaticResource GeodeticLocationConverter}-->
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="0" Margin="10 5 0 0" IsReadOnly="True"
+					 Text="{Binding TrackedVehicle.Latitude, Mode=OneWay, Converter={StaticResource RadiansToDegreesLocationConverter}, StringFormat={}{0:#.#######}}"
+					 />
+			
+			<TextBlock Text="Longitude:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" Margin="0 5 0 0"/>
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Margin="10 5 0 0" IsReadOnly="True"
+					 Text="{Binding TrackedVehicle.Longitude, Mode=OneWay, Converter={StaticResource RadiansToDegreesLocationConverter}, StringFormat={}{0:#.#######}}"
+					 />
+
+			<TextBlock Text="Altitude AMSL" VerticalAlignment="Center" Grid.Column="0" Grid.Row="2" Margin="0 5 0 0"/>
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="2" Margin="10 5 0 0" IsReadOnly="True"
+					 Text="{Binding TrackedVehicle.Altitude, Mode=OneWay, StringFormat={}{0:#.##}}"
+					 />
+		</Grid>
+
+		<StackPanel Classes="HR" DockPanel.Dock="Top">
+			<Border />
+			<TextBlock Text="Platform orientation" />
+		</StackPanel>
+
+		<!--<TextBlock Text="Platform orientation" DockPanel.Dock="Top"  VerticalAlignment="Center" Margin="0 10 0 0" FontSize="18" FontWeight="Bold" />-->
+
+		<Grid DockPanel.Dock="Top" ColumnDefinitions="*,*, Auto" RowDefinitions="Auto, Auto, Auto, Auto" Margin="10 0 0 0">
+
+			<TextBlock Text="Pan:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0" Margin="0 5 0 0"/>
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="0" Margin="10 5 0 0" IsReadOnly="True"
+					 Text="{Binding DroneTracker.CurrentPlatformPan, Mode=OneWay, StringFormat={}{0:#.##}}"
+					 />
+
+			
+			<TextBlock Text="Tilt:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" Margin="0 5 0 0"/>
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Margin="10 5 0 0" IsReadOnly="True"
+					 Text="{Binding DroneTracker.CurrentPlatformTilt, Mode=OneWay, StringFormat={}{0:#.##}}"
+					 />
+
+			<TextBlock Text="Azimuth:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="2" Margin="0 5 0 0"/>
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="2" Margin="10 5 0 0" IsReadOnly="True"
+					 Text="{Binding DroneTracker.TargetAzimuth, Mode=OneWay, StringFormat={}{0:0.##}}"
+					 />
+
+			<TextBlock Text="Wires angle:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="3" Margin="0 5 0 0"/>
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="3" Margin="10 0 0 0" IsReadOnly="True"
+					 Text="{Binding DroneTracker.TwistedWiresAngle, Mode=OneWay, StringFormat={}{0:#.##}}"
+					 />
+			<Button Classes="IconButton" Grid.Column="2" Grid.Row="3" 
+					Command="{Binding ResetWiresProtectionCommand}" ToolTip.Tip="Reset twisted wires angle"
+					Margin="0 5 0 0" HorizontalAlignment="Center" VerticalAlignment="Center">
+				<Path VerticalAlignment="Center" Width="24" Height="24" Margin="0 0 0 0" Data="M19,8L15,12H18A6,6 0 0,1 12,18C11,18 10.03,17.75 9.2,17.3L7.74,18.76C8.97,19.54 10.43,20 12,20A8,8 0 0,0 20,12H23M6,12A6,6 0 0,1 12,6C13,6 13.97,6.25 14.8,6.7L16.26,5.24C15.03,4.46 13.57,4 12,4A8,8 0 0,0 4,12H1L5,16L9,12" />
+			</Button>
+
+
+		</Grid>
+
+		<StackPanel Classes="HR" DockPanel.Dock="Top">
+			<Border />
+			<TextBlock Text="Manual mode" />
+		</StackPanel>
+
+
+		<StackPanel DockPanel.Dock="Top" HorizontalAlignment="Stretch" Margin="0 10 0 0">
+
+			<Grid x:Name="RemoteButtons" ShowGridLines="False"
+				  ColumnDefinitions="Auto,Auto,Auto" RowDefinitions="*,*,*" Margin="10 0 10 0" HorizontalAlignment="Center">
+				<Button Content="Up" Grid.Column="1" Grid.Row="0" Classes="IconButton" Margin="5 0 5 0"
+						CommandParameter="{x:Static vm:RemoteControlActionType.TiltUp}"
+						IsEnabled="{Binding IsManualControl}"
+							>
+					<Path Data="M12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22M12,7L7,12H10V16H14V12H17L12,7Z" />
+				</Button>
+
+				<Button Grid.Column="0" Grid.Row="1" Margin="0 0 0 0" Classes="IconButton"
+						CommandParameter="{x:Static vm:RemoteControlActionType.PanLeft}"
+						HorizontalAlignment="Right"
+						IsEnabled="{Binding IsManualControl}">
+					<Path
+						  Data="M22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2A10,10 0 0,1 22,12M7,12L12,17V14H16V10H12V7L7,12Z" />
+				</Button>
+
+				<ToggleButton Content="Manual mode" Classes="IconButton" HorizontalContentAlignment="Center"
+							  Command="{Binding ToggleManualControl}" IsChecked="{Binding IsManualControl, Mode=OneWay}"
+							  BorderThickness="0" ToolTip.Tip="Gain / Release manual control"
+							  Grid.Column="1" Grid.Row="1" Margin="0 0 0 0" Padding="5">
+					<Path Margin="0 0 0 0" Stretch="UniformToFill" Fill="#CC120F"
+						  Data="M9,12C9,11.19 9.3,10.5 9.89,9.89C10.5,9.3 11.19,9 12,9C12.81,9 13.5,9.3 14.11,9.89C14.7,10.5 15,11.19 15,12C15,12.81 14.7,13.5 14.11,14.11C13.5,14.7 12.81,15 12,15C11.19,15 10.5,14.7 9.89,14.11C9.3,13.5 9,12.81 9,12M5.53,8.44L7.31,10.22L5.53,12L7.31,13.78L5.53,15.56L2,12L5.53,8.44M8.44,18.47L10.22,16.69L12,18.47L13.78,16.69L15.56,18.47L12,22L8.44,18.47M18.47,15.56L16.69,13.78L18.47,12L16.69,10.22L18.47,8.44L22,12L18.47,15.56M15.56,5.53L13.78,7.31L12,5.53L10.22,7.31L8.44,5.53L12,2L15.56,5.53Z"
+					/>
+				</ToggleButton>
+
+				<Button Grid.Column="2" Grid.Row="1" Margin="0 0 0 0" Classes="IconButton" HorizontalAlignment="Left"
+						CommandParameter="{x:Static vm:RemoteControlActionType.PanRight}"
+						IsEnabled="{Binding IsManualControl}"
+							>
+					<Path Data="M2,12A10,10 0 0,1 12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12M17,12L12,7V10H8V14H12V17L17,12Z" />
+				</Button>
+
+				<Button Grid.Column="1" Grid.Row="2" Margin="5 0 5 0" Classes="IconButton"
+						CommandParameter="{x:Static vm:RemoteControlActionType.TiltDown}"
+					IsEnabled="{Binding IsManualControl}"						>
+					<Path Data="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,17L17,12H14V8H10V12H7L12,17Z" />
+				</Button>
+
+			</Grid>
+
+		</StackPanel>
+
+	</DockPanel>
+</UserControl>

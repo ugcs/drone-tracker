@@ -1,0 +1,45 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:UGCS.DroneTracker.Avalonia.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="UGCS.DroneTracker.Avalonia.Views.ConnectionStatusView">
+	<UserControl.Resources>
+
+		<views:UgcsConnectionStatusColorConverter x:Key="UgcsConnectionStatusColorConverter" />
+		<views:BoolConnectedStatusColorConverter x:Key="BoolConnectedStatusColorConverter" />
+		
+	</UserControl.Resources>
+
+	<Grid RowDefinitions="36" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+		<Grid.Styles>
+			<Style Selector="TextBlock.States">
+				<Setter Property="Foreground" Value="White"/>
+				<Setter Property="VerticalAlignment" Value="Center"/>
+				<Setter Property="Margin" Value="5 0 20 0"/>
+				<Setter Property="FontFamily" Value="/Fonts/Roboto-Regular.ttf#Roboto" />
+			</Style>
+			<Style Selector = "Ellipse.Big">
+				<Setter Property = "Width" Value="18"/>
+				<Setter Property = "Height" Value="18"/>
+			</Style>
+			<Style Selector = "Ellipse.Little">
+				<Setter Property = "Width" Value="6"/>
+				<Setter Property = "Height" Value="6"/>
+			</Style>
+		</Grid.Styles>
+		<Ellipse Classes="Big" Grid.Row="0" Grid.Column="0" Fill="{Binding UgcsStatus, Converter={StaticResource UgcsConnectionStatusColorConverter}, ConverterParameter=outer}"></Ellipse>
+		<Ellipse Classes="Little" Grid.Row="0" Grid.Column="0" Fill="{Binding UgcsStatus, Converter={StaticResource UgcsConnectionStatusColorConverter}, ConverterParameter=inner}" ></Ellipse>
+		<TextBlock  Classes="States" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" >UgCS</TextBlock>
+
+		<Ellipse Classes="Big" Grid.Row="0" Grid.Column="2" Fill="{Binding IsSelectedVehicleConnected, Converter={StaticResource BoolConnectedStatusColorConverter}, ConverterParameter=outer}"></Ellipse>
+		<Ellipse Classes="Little" Grid.Row="0" Grid.Column="2" Fill="{Binding IsSelectedVehicleConnected, Converter={StaticResource BoolConnectedStatusColorConverter}, ConverterParameter=inner}"></Ellipse>
+		<TextBlock  Classes="States" Grid.Row="0" Grid.Column="3"  >Drone</TextBlock>
+
+		<Ellipse Classes="Big" Grid.Row="0" Grid.Column="4" Fill="{Binding IsPTZConnected, Converter={StaticResource BoolConnectedStatusColorConverter}, ConverterParameter=outer}"></Ellipse>
+		<Ellipse Classes="Little" Grid.Row="0" Grid.Column="4" Fill="{Binding IsPTZConnected, Converter={StaticResource BoolConnectedStatusColorConverter}, ConverterParameter=inner}"></Ellipse>
+		<TextBlock  Classes="States" Grid.Row="0" Grid.Column="5" >PTZ device</TextBlock>
+	</Grid>	
+	
+</UserControl>

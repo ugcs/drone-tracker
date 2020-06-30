@@ -1,0 +1,36 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:rxui="http://reactiveui.net"
+        xmlns:vm="clr-namespace:UGCS.DroneTracker.Avalonia.ViewModels;assembly=DroneTracker-AV"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="364" d:DesignHeight="640"
+        x:Class="UGCS.DroneTracker.Avalonia.Views.MainWindow"
+        Icon="avares://DroneTracker-AV/Assets/ugcs-logo-32.ico"
+		FontFamily="resm:DroneTracker-AV.Fonts.Roboto-*.ttf#Roboto"
+
+        MinWidth="400" MinHeight="800" MaxHeight="1100" MaxWidth="500"
+		
+        FontWeight="Regular"
+        FontStyle="Normal"
+        FontSize="16"
+		
+		UseLayoutRounding="True"
+		
+		
+        Title="UGCS Drone Tracker 0.0.1">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+	<ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
+		<DockPanel>
+			<rxui:RoutedViewHost Router="{Binding Router}">
+				<rxui:RoutedViewHost.DefaultContent>
+					<TextBlock Text="Initialize..." HorizontalAlignment="Center" VerticalAlignment="Center"/>			
+				</rxui:RoutedViewHost.DefaultContent>
+			</rxui:RoutedViewHost>
+		</DockPanel>
+	</ScrollViewer>
+</Window>

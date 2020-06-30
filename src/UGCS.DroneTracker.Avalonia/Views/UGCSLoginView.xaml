@@ -1,0 +1,46 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="UGCS.DroneTracker.Avalonia.Views.UGCSLoginView">
+	<DockPanel Margin="10">
+
+		<StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Stretch" IsVisible="{Binding ShowLoginParams}">
+			<Button Background="#0089CF" Content="Login" Command="{Binding LoginCommand}" Grid.Column="1" Margin="5 0 0 0"  />
+		</StackPanel>
+
+
+		<StackPanel DockPanel.Dock="Top" Orientation="Vertical" HorizontalAlignment="Stretch" Margin="0 0 0 0">
+			<TextBlock Text="UgCS connection" VerticalAlignment="Center" FontWeight="Bold" FontSize="18" Margin="0 5 0 0" />
+		</StackPanel>
+
+		<Grid DockPanel.Dock="Top" 
+			  ColumnDefinitions="Auto, *" 
+			  RowDefinitions="Auto, Auto, Auto, Auto, Auto" 
+			  Margin="10"
+			  IsVisible="{Binding ShowLoginParams}"
+			  >
+
+			<TextBlock Text="Host" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0" />
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="0" Text="{Binding UGCSHost}" Margin="10 0 0 0" />
+
+			<TextBlock Text="Port" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" Margin="0 5 0 0" />
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Text="{Binding UGCSPort}" Margin="10 5 0 0" />
+
+			<TextBlock Text="Login" VerticalAlignment="Center" Grid.Column="0" Grid.Row="2" Margin="0 5 0 0"/>
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="2" Text="{Binding UGCSLogin}" Margin="10 5 0 0" />
+
+			<TextBlock Text="Password" VerticalAlignment="Center" Grid.Column="0" Grid.Row="3" Margin="0 5 0 0"/>
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="3" Text="{Binding UGCSPassword}" Margin="10 5 0 0" />
+		</Grid>
+
+		<TextBlock DockPanel.Dock="Top" 
+				   Text="{Binding Message}" 
+				   HorizontalAlignment="Center" 
+				   VerticalAlignment="Center"
+				   Margin="10"
+				   FontSize="20"
+				   />
+	</DockPanel>
+</UserControl>

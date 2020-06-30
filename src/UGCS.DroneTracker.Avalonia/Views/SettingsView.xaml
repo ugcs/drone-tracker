@@ -1,0 +1,106 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="UGCS.DroneTracker.Avalonia.Views.SettingsView">
+	<DockPanel Margin="10">
+
+		<StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Stretch">
+			<Grid ColumnDefinitions="*,*" HorizontalAlignment="Stretch" >
+				<Button Content="Cancel" Command="{Binding GoBackCommand}" Grid.Column="0" Margin="0 0 5 0"/>
+				<Button Background="#0089CF" Content="Apply" Command="{Binding ApplyAndGoBackCommand}" Grid.Column="1" Margin="5 0 0 0"  />
+			</Grid>
+		</StackPanel>
+
+
+		<StackPanel Classes="HR" DockPanel.Dock="Top">
+			<Border />
+			<TextBlock Text="UgCS connection" />
+		</StackPanel>
+
+		<Grid DockPanel.Dock="Top" ColumnDefinitions="Auto, *" 
+			  RowDefinitions="Auto, Auto, Auto, Auto, Auto" Margin="5">
+
+			<TextBlock Text="Host" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0" />
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="0" Text="{Binding UGCSHost}" Margin="10 0 0 0" />
+
+			<TextBlock Text="Port" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" Margin="0 5 0 0" />
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Text="{Binding UGCSPort}" Margin="10 5 0 0" />
+
+			<TextBlock Text="Login" VerticalAlignment="Center" Grid.Column="0" Grid.Row="2" Margin="0 5 0 0"/>
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="2" Text="{Binding UGCSLogin}" Margin="10 5 0 0" />
+
+			<TextBlock Text="Password" VerticalAlignment="Center" Grid.Column="0" Grid.Row="3" Margin="0 5 0 0"/>
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="3" Text="{Binding UGCSPassword}" Margin="10 5 0 0" />
+
+		</Grid>
+
+		<StackPanel Classes="HR" DockPanel.Dock="Top">
+			<Border />
+			<TextBlock Text="PTZ connection" />
+		</StackPanel>
+
+		<Grid DockPanel.Dock="Top" ColumnDefinitions="Auto, *" 
+			  RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto" Margin="5">
+
+			<TextBlock Text="Device address" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0" />
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="0" Text="{Binding PTZDeviceAddress}" Margin="10 0 0 0" />
+
+			<TextBlock Text="Connect via:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" />
+			<ComboBox Grid.Column="1" Grid.Row="1" Height="32" Margin="10 5 0 5" SelectedItem="{Binding PtzDeviceTransportType}" Items="{Binding PtzDeviceTransportTypes}">
+			</ComboBox>
+
+			<TextBlock Text="Udp Host" VerticalAlignment="Center" Grid.Column="0" Grid.Row="2" />
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="2" Text="{Binding PTZUdpHost}" Margin="10 0 0 0" />
+
+			<TextBlock Text="Udp Port" VerticalAlignment="Center" Grid.Column="0" Grid.Row="3" Margin="0 5 0 0" />
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="3" Text="{Binding PTZUdpPort}" Margin="10 5 0 0" />
+
+			<TextBlock Text="Serial Port Name" VerticalAlignment="Center" Grid.Column="0" Grid.Row="4" Margin="0 5 0 0" />
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="4" Text="{Binding PTZSerialPortName}" Margin="10 5 0 0" />
+
+			<TextBlock Text="Serial Port Speed" VerticalAlignment="Center" Grid.Column="0" Grid.Row="5" Margin="0 5 0 0" />
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="5" Text="{Binding PTZSerialPortSpeed}" Margin="10 5 0 0" />
+
+		</Grid>
+
+		<StackPanel Classes="HR" DockPanel.Dock="Top">
+			<Border />
+			<TextBlock Text="PTZ configuration" />
+		</StackPanel>
+
+
+		<Grid DockPanel.Dock="Top" ColumnDefinitions="Auto, *" 
+			  RowDefinitions="Auto, Auto, Auto" Margin="5">
+
+			<!--<TextBlock Text="Pan/Tilt max speed" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0" />
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="0" Text="{Binding PTZMaxSpeed}" Margin="10 0 0 0" />-->
+
+			<TextBlock Text="Pan angle to ptz coordinate factor" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" />
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Text="{Binding PTZPanAngleToCoordinateFactor}" Margin="10 5 0 0" />
+
+			<TextBlock Text="Tilt angle to ptz coordinate factor" VerticalAlignment="Center" Grid.Column="0" Grid.Row="2" Margin="0 5 0 0" />
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="2" Text="{Binding PTZTiltAngleToCoordinateFactor}" Margin="10 5 0 0" />
+
+		</Grid>
+
+		<StackPanel Classes="HR" DockPanel.Dock="Top">
+			<Border />
+			<TextBlock Text="Tracker configuration" />
+		</StackPanel>
+
+
+		<Grid DockPanel.Dock="Top" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto" Margin="5">
+
+			<TextBlock Text="Wires protection" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0" />
+			<ComboBox Grid.Column="1" Grid.Row="0" Height="32" Margin="10 0 0 5" SelectedItem="{Binding WiresProtection}" Items="{Binding WiresProtectionModes}">
+			</ComboBox>
+
+		</Grid>
+
+
+
+	</DockPanel>
+
+</UserControl>
