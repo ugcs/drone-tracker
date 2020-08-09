@@ -29,6 +29,7 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
         private double _ptzMaxPanAngle;
         private double _ptzMinPanAngle;
         private WiresProtectionMode _wiresProtection;
+        private double _panSpeed;
 
         public string UrlPathSegment => "Settings";
 
@@ -171,6 +172,12 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
             set => this.RaiseAndSetIfChanged(ref _wiresProtection, value);
         }
 
+        public double PanSpeed
+        {
+            get => _panSpeed;
+            set => this.RaiseAndSetIfChanged(ref _panSpeed, value);
+        }
+
         public SettingsViewModel(IScreen hostScreen, IApplicationSettingsManager settingsManager)
         {
             HostScreen = hostScreen;
@@ -210,6 +217,7 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
             PTZTiltAngleToCoordinateFactor = settings.PTZTiltAngleToCoordinatesFactor;
 
             WiresProtection = settings.WiresProtection;
+            PanSpeed = settings.PanSpeed;
         }
 
 
@@ -248,6 +256,7 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
             settings.PTZTiltAngleToCoordinatesFactor = PTZTiltAngleToCoordinateFactor;
 
             settings.WiresProtection = WiresProtection;
+            settings.PanSpeed = PanSpeed;
 
             _settingsManager.Save(settings);
 

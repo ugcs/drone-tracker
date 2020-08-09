@@ -58,6 +58,7 @@ namespace UGCS.DroneTracker.Core.Services
         private double _minPanChangedThreshold;
         private double _minTiltChangedThreshold;
         private double _targetAzimuth;
+        private double _panSpeed;
 
 
         private double TwistedWiresZeroAngle { get; set; }
@@ -223,22 +224,40 @@ namespace UGCS.DroneTracker.Core.Services
                 }
             }
             _logger.LogDebugMessage($"doTwistWiresPanCorrection: Intermediate rotation => currentPan={CurrentPlatformPan}, interAngle={wiresCorrectionIntermediateAngle}");
+            
             CurrentPlatformPan = wiresCorrectionIntermediateAngle;
 
-            _ptzController?.PanToAsync(_ptzDeviceAddress, CurrentPlatformPan)
-                .GetAwaiter()
-                .GetResult();
+            //_ptzController?.PanToAsync(_ptzDeviceAddress, CurrentPlatformPan)
+            //    .GetAwaiter()
+            //    .GetResult();
+
+            _ptzController?.PanTo(_ptzDeviceAddress, CurrentPlatformPan);
+
+            var waitingDelay = (int) (TWIST_WIRES_CORRECTION_INTERMEDIATE_ANGLE / _panSpeed * 1000);
+            _logger.LogDebugMessage($"doTwistWiresPanCorrection: Waiting to Intermediate rotation complete: delay={waitingDelay} ms");
+            Task.Delay(waitingDelay).Wait();
+
             
             _logger.LogDebugMessage($"doTwistWiresPanCorrection: Intermediate rotation completed");
 
             TwistedWiresAngle = calcNewTwistedWiresAngle(TwistedWiresZeroAngle, newPlatformPan, currentTwistAngle: 0);
 
-            _logger.LogDebugMessage($"doTwistWiresPanCorrection: finishing rotation => currentPan={CurrentPlatformPan}, interAngle={newPlatformPan}");
-            CurrentPlatformPan = newPlatformPan;
+            var anglesDelta = getAnglesDelta(CurrentPlatformPan, newPlatformPan);
 
-            _ptzController?.PanToAsync(_ptzDeviceAddress, newPlatformPan)
-                .GetAwaiter()
-                .GetResult();
+            _logger.LogDebugMessage($"doTwistWiresPanCorrection: finishing rotation => currentPan={CurrentPlatformPan}, interAngle={newPlatformPan}, anglesDelta={anglesDelta}");
+
+
+            //_ptzController?.PanToAsync(_ptzDeviceAddress, newPlatformPan)
+            //    .GetAwaiter()
+            //    .GetResult();
+
+
+            _ptzController?.PanTo(_ptzDeviceAddress, newPlatformPan);
+            waitingDelay = (int)(anglesDelta / _panSpeed * 1000);
+            _logger.LogDebugMessage($"doTwistWiresPanCorrection: Waiting to finishing rotation complete: delay={waitingDelay} ms");
+            Task.Delay(waitingDelay).Wait();
+
+            CurrentPlatformPan = newPlatformPan;
 
             _logger.LogDebugMessage($"doTwistWiresPanCorrection: finishing rotation completed");
         }
@@ -258,6 +277,8 @@ namespace UGCS.DroneTracker.Core.Services
             _initialNorthDirection = trackSettings.InitialNorthDirection;
 
             _isWiresProtectionMode = trackSettings.WiresProtectionMode;
+
+            _panSpeed = trackSettings.PanSpeed;
 
             _ptzDeviceAddress = trackSettings.PTZDeviceAddress;
 
@@ -299,6 +320,21 @@ namespace UGCS.DroneTracker.Core.Services
             }
         }
 
+        private double getAnglesDelta(double startAngle, double endAngle)
+        {
+            var startAngleRad = startAngle * LocationUtils.DEGREES_TO_RADIANS;
+            var startSin = Math.Sin(startAngleRad);
+            var startCos = Math.Cos(startAngleRad);
+
+            var endAngleRad = endAngle * LocationUtils.DEGREES_TO_RADIANS;
+            var endSin = Math.Sin(endAngleRad);
+            var endCos = Math.Cos(endAngleRad);
+
+            var rotationAngle = getRotationAngle(startSin, startCos, endSin, endCos) * LocationUtils.RADIANS_TO_DEGREES;
+            rotationAngle = Math.Round(rotationAngle, 2);
+
+            return rotationAngle;
+        }
 
         private double calcNewTwistedWiresAngle(double startRotationAngle, double endRotationAngle, double currentTwistAngle)
         {

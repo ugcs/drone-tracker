@@ -160,7 +160,10 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
         {
             _logger.LogInfoMessage("doStopPositioning requested");
             _ptzController.Stop(getAppSettings.PTZDeviceAddress);
+
+            DroneTracker.UpdateCurrentPosition();
         }
+
 
         private void doStartPositioning(RemoteControlActionType remoteControlAction)
         {
@@ -216,7 +219,8 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
                 MinimalPanChangedThreshold = settings.MinimalPanChangedThreshold,
                 MinimalTiltChangedThreshold = settings.MinimalTiltChangedThreshold,
 
-                WiresProtectionMode = settings.WiresProtection
+                WiresProtectionMode = settings.WiresProtection,
+                PanSpeed = settings.PanSpeed
             };
 
             DroneTracker.StartTrack(trackSettings);

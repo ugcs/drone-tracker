@@ -73,6 +73,8 @@ namespace UGCS.DroneTracker.Core.Settings
 
         public WiresProtectionMode WiresProtection { get; set; } = WiresProtectionMode.AllRound;
 
+        public double PanSpeed { get; set; } = 42.0;
+
         public Dictionary<PelcoDEMessageType, byte> PelcoCodesMapping { get; set; } =
             DefaultPelcoCodesMappingFactory.CodesMapping;
 

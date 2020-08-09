@@ -15,5 +15,7 @@ namespace UGCS.DroneTracker.Core.Services
         public double MinimalPanChangedThreshold { get; set; }
         public double MinimalTiltChangedThreshold { get; set; }
         public WiresProtectionMode WiresProtectionMode { get; set; }
+
+        public double PanSpeed { get; set; }
     }
 }

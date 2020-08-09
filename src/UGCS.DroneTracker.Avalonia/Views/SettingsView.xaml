@@ -97,6 +97,10 @@
 			<ComboBox Grid.Column="1" Grid.Row="0" Height="32" Margin="10 0 0 5" SelectedItem="{Binding WiresProtection}" Items="{Binding WiresProtectionModes}">
 			</ComboBox>
 
+			<TextBlock Text="Pan speed (deg/sec)" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" />
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Text="{Binding PanSpeed}" Margin="10 5 0 0" />
+
+
 		</Grid>
 
 
