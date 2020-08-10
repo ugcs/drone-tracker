@@ -21,7 +21,7 @@ namespace UGCS.DroneTracker.Core.Services
         void StopTrack();
 
         void ResetTotalRotation();
-        Task<bool> UpdateCurrentPosition();
+        Task<bool> UpdateCurrentPosition(byte deviceAddress);
     }
     
     public class DroneTracker : INotifyPropertyChanged, IDroneTracker
@@ -38,32 +38,18 @@ namespace UGCS.DroneTracker.Core.Services
         private double? _altitude;
         private double? _latitude;
         private double? _longitude;
-
-        private double _initialPlatformTilt;
-        private double _initialPlatformRoll;
-
-        private double _initialNorthDirection;
         
-        private double _initialPlatformLatitude;
-        private double _initialPlatformLongitude;
-        private double _initialPlatformAltitude;
-
-
         private bool _isTrackStarted;
-        private WiresProtectionMode _isWiresProtectionMode;
 
         private double _totalRotationAngle;
         private double _currentPlatformTilt;
         private double _currentPlatformPan;
         private Task _twistedWirePanCorrectionTask;
-        private byte _ptzDeviceAddress;
 
-        private double _minPanChangedThreshold;
-        private double _minTiltChangedThreshold;
         private double _targetAzimuth;
-        private double _panSpeed;
-        
 
+
+        private DroneTrackerSettings _trackSettings;
 
         private double TotalRotationZeroAngle { get; set; }
 
@@ -128,8 +114,14 @@ namespace UGCS.DroneTracker.Core.Services
 
             if (!_latitude.HasValue || !_longitude.HasValue || !_altitude.HasValue) return;
 
-            var ptzLatRad = _initialPlatformLatitude * LocationUtils.DEGREES_TO_RADIANS;
-            var ptzLonRad = _initialPlatformLongitude * LocationUtils.DEGREES_TO_RADIANS;
+            var deviceAddress = _trackSettings.PTZDeviceAddress;
+
+            var initialPlatformLatitude = _trackSettings.InitialPlatformLatitude;
+            var initialPlatformLongitude = _trackSettings.InitialPlatformLongitude;
+            var initialNorthDirection = _trackSettings.InitialNorthDirection;
+
+            var ptzLatRad = initialPlatformLatitude * LocationUtils.DEGREES_TO_RADIANS;
+            var ptzLonRad = initialPlatformLongitude * LocationUtils.DEGREES_TO_RADIANS;
 
             var vehicleLatRad = _latitude.Value;
             var vehicleLonRad = _longitude.Value;
@@ -138,34 +130,34 @@ namespace UGCS.DroneTracker.Core.Services
             modelAzimuth = Math.Round(modelAzimuth, 2);
             TargetAzimuth = modelAzimuth;
 
-            var newPlatformPan = Math.Round(((modelAzimuth + _initialNorthDirection + 360) % 360), 2);
+            var newPlatformPan = Math.Round(((modelAzimuth + initialNorthDirection + 360) % 360), 2);
 
             var distance = LocationUtils.GetDistance(
-                _initialPlatformLatitude * LocationUtils.DEGREES_TO_RADIANS, 
-                _initialPlatformLongitude * LocationUtils.DEGREES_TO_RADIANS, 
+                initialPlatformLatitude * LocationUtils.DEGREES_TO_RADIANS, 
+                initialPlatformLongitude * LocationUtils.DEGREES_TO_RADIANS, 
                 vehicleLatRad, vehicleLonRad);
 
-            var deltaHeight = _altitude.Value - _initialPlatformAltitude;
+            var deltaHeight = _altitude.Value - _trackSettings.InitialPlatformAltitude;
             var tiltAngleRad = Math.Atan2(deltaHeight, distance);
             var modelPitch = Math.Round(tiltAngleRad * LocationUtils.RADIANS_TO_DEGREES, 2);
-            var newPlatformTilt = 90 - modelPitch - _initialPlatformTilt;
+            var newPlatformTilt = 90 - modelPitch - _trackSettings.InitialPlatformTilt;
 
 
             //_logger.LogDebugMessage($"Selected vehicle telemetry changed: lat:{_latitude}, lon:{_longitude}, alt:{_altitude}");
             //_logger.LogDebugMessage($"Calculated ptz pan:{newPlatformPan}, tilt:{newPlatformTilt}");
 
-            if (Math.Abs(CurrentPlatformPan - newPlatformPan) > _minPanChangedThreshold)
+            if (Math.Abs(CurrentPlatformPan - newPlatformPan) > _trackSettings.MinimalPanChangedThreshold)
             {
                 _logger.LogDebugMessage($"processTelemetry => Selected vehicle current telemetry: lat={_latitude}, lon={_longitude}, alt={_altitude}");
                 _logger.LogDebugMessage($"processTelemetry => PTZ need to change Pan. New pan={newPlatformPan}, old pan={CurrentPlatformPan}");
 
 
-                switch (_isWiresProtectionMode)
+                switch (_trackSettings.WiresProtectionMode)
                 {
                     case WiresProtectionMode.Disabled:
 
                         CurrentPlatformPan = newPlatformPan;
-                        _ptzController.PanTo(_ptzDeviceAddress, CurrentPlatformPan);
+                        _ptzController.PanTo(deviceAddress, CurrentPlatformPan);
 
                         break;
                     case WiresProtectionMode.AllRound:
@@ -176,7 +168,7 @@ namespace UGCS.DroneTracker.Core.Services
                         if (Math.Abs(TotalRotationAngle) < MAX_ANGLE_TO_ALLROUND_TWIST_WIRES_CORRECTION)
                         {
                             CurrentPlatformPan = newPlatformPan;
-                            _ptzController?.PanTo(_ptzDeviceAddress, CurrentPlatformPan);
+                            _ptzController?.PanTo(deviceAddress, CurrentPlatformPan);
                         }
                         else
                         {
@@ -199,7 +191,7 @@ namespace UGCS.DroneTracker.Core.Services
                         if (Math.Abs(TotalRotationAngle) < MAX_ANGLE_TO_DEADZONE_WIRES_PROTECTION / 2.0)
                         {
                             CurrentPlatformPan = newPlatformPan;
-                            _ptzController?.PanTo(_ptzDeviceAddress, CurrentPlatformPan);
+                            _ptzController?.PanTo(deviceAddress, CurrentPlatformPan);
                         }
                         else
                         {
@@ -213,13 +205,13 @@ namespace UGCS.DroneTracker.Core.Services
                 }
             }
 
-            if (Math.Abs(CurrentPlatformTilt - newPlatformTilt) > _minTiltChangedThreshold)
+            if (Math.Abs(CurrentPlatformTilt - newPlatformTilt) > _trackSettings.MinimalTiltChangedThreshold)
             {
                 _logger.LogDebugMessage($"processTelemetry => Selected vehicle current telemetry: lat={_latitude}, lon={_longitude}, alt={_altitude}");
                 _logger.LogDebugMessage($"processTelemetry => PTZ need to change Tilt. New tilt={newPlatformTilt}, old tilt={CurrentPlatformTilt}");
                 
                 CurrentPlatformTilt = newPlatformTilt;
-                _ptzController?.TiltTo(_ptzDeviceAddress, CurrentPlatformTilt);
+                _ptzController?.TiltTo(deviceAddress, CurrentPlatformTilt);
             }
         }
 
@@ -253,9 +245,9 @@ namespace UGCS.DroneTracker.Core.Services
             //    .GetAwaiter()
             //    .GetResult();
 
-            _ptzController?.PanTo(_ptzDeviceAddress, CurrentPlatformPan);
+            _ptzController?.PanTo(_trackSettings.PTZDeviceAddress, CurrentPlatformPan);
 
-            var waitingDelay = (int) (ALLROUND_TWIST_WIRES_CORRECTION_INTERMEDIATE_ANGLE / _panSpeed * 1000);
+            var waitingDelay = (int) (ALLROUND_TWIST_WIRES_CORRECTION_INTERMEDIATE_ANGLE / _trackSettings.PanSpeed * 1000);
             _logger.LogDebugMessage($"doAllRoundTwistWiresPanCorrection: Waiting to Intermediate rotation complete: delay={waitingDelay} ms");
             Task.Delay(waitingDelay).Wait();
 
@@ -274,8 +266,8 @@ namespace UGCS.DroneTracker.Core.Services
             //    .GetResult();
 
 
-            _ptzController?.PanTo(_ptzDeviceAddress, newPlatformPan);
-            waitingDelay = (int)(anglesDelta / _panSpeed * 1000);
+            _ptzController?.PanTo(_trackSettings.PTZDeviceAddress, newPlatformPan);
+            waitingDelay = (int)(anglesDelta / _trackSettings.PanSpeed * 1000);
             _logger.LogDebugMessage($"doAllRoundTwistWiresPanCorrection: Waiting to finishing rotation complete: delay={waitingDelay} ms");
             Task.Delay(waitingDelay).Wait();
 
@@ -289,23 +281,7 @@ namespace UGCS.DroneTracker.Core.Services
         {
             _logger.LogInfoMessage($"StartTrack requested => trackSettings:\n{JsonConvert.SerializeObject(trackSettings, Formatting.Indented)}");
 
-            _initialPlatformLatitude = trackSettings.InitialPlatformLatitude;
-            _initialPlatformLongitude = trackSettings.InitialPlatformLongitude;
-            _initialPlatformAltitude = trackSettings.InitialPlatformAltitude;
-
-            _initialPlatformTilt = trackSettings.InitialPlatformTilt;
-            _initialPlatformRoll = trackSettings.InitialPlatformRoll;
-
-            _initialNorthDirection = trackSettings.InitialNorthDirection;
-
-            _isWiresProtectionMode = trackSettings.WiresProtectionMode;
-
-            _panSpeed = trackSettings.PanSpeed;
-
-            _ptzDeviceAddress = trackSettings.PTZDeviceAddress;
-
-            _minPanChangedThreshold = trackSettings.MinimalPanChangedThreshold;
-            _minTiltChangedThreshold = trackSettings.MinimalTiltChangedThreshold;
+            _trackSettings = trackSettings;
 
             _isTrackStarted = true;
             
@@ -324,13 +300,13 @@ namespace UGCS.DroneTracker.Core.Services
             TotalRotationZeroAngle = CurrentPlatformPan;
         }
 
-        public async Task<bool> UpdateCurrentPosition()
+        public async Task<bool> UpdateCurrentPosition(byte deviceAddress)
         {
             try
             {
-                var ptzPan = await _ptzController.RequestPanAngleAsync(_ptzDeviceAddress);
+                var ptzPan = await _ptzController.RequestPanAngleAsync(deviceAddress);
                 CurrentPlatformPan = ptzPan;
-                var ptzTilt = await _ptzController.RequestTiltAngleAsync(_ptzDeviceAddress);
+                var ptzTilt = await _ptzController.RequestTiltAngleAsync(deviceAddress);
                 CurrentPlatformTilt = ptzTilt;
                 return true;
             }

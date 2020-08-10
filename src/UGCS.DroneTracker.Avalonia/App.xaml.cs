@@ -23,7 +23,7 @@ namespace UGCS.DroneTracker.Avalonia
 {
     public class App : Application
     {
-        public IKernel Kernel => _kernel ??= new StandardKernel(new NinjectBindings());
+        public IKernel Kernel => _kernel ??= new StandardKernel(new NinjectBindings(), new AutoMapperModule());
         public static App AppInstance => Current as App;
 
         public const string ApplicationDataFolderName = "UGCS-DroneTracker";

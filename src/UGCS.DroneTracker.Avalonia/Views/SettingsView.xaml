@@ -48,7 +48,7 @@
 			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="0" Text="{Binding PTZDeviceAddress}" Margin="10 0 0 0" />
 
 			<TextBlock Text="Connect via:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" />
-			<ComboBox Grid.Column="1" Grid.Row="1" Height="32" Margin="10 5 0 5" SelectedItem="{Binding PtzDeviceTransportType}" Items="{Binding PtzDeviceTransportTypes}">
+			<ComboBox Grid.Column="1" Grid.Row="1" Height="32" Margin="10 5 0 5" SelectedItem="{Binding PTZTransportType}" Items="{Binding PtzDeviceTransportTypes}">
 			</ComboBox>
 
 			<TextBlock Text="Udp Host" VerticalAlignment="Center" Grid.Column="0" Grid.Row="2" />

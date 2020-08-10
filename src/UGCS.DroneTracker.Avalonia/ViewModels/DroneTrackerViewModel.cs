@@ -109,7 +109,7 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
             {
                 Task.Factory.StartNew(async () =>
                 {
-                    var updatePositionSuccess = await this.DroneTracker.UpdateCurrentPosition();
+                    var updatePositionSuccess = await this.DroneTracker.UpdateCurrentPosition(_settingsManager.GetAppSettings().PTZDeviceAddress);
                     if (updatePositionSuccess)
                     {
                         this.DroneTracker.ResetTotalRotation();

@@ -176,17 +176,17 @@
 			<TextBlock Text="Latitude:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0" Margin="0 5 0 0"/>
 			<!--, Converter={StaticResource GeodeticLocationConverter}-->
 			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="0" Margin="10 5 0 0" IsReadOnly="True"
-					 Text="{Binding TrackedVehicle.Latitude, Mode=OneWay, Converter={StaticResource RadiansToDegreesLocationConverter}, StringFormat={}{0:#.#######}}"
+					 Text="{Binding TrackedVehicle.Latitude, Mode=OneWay, Converter={StaticResource RadiansToDegreesLocationConverter}, StringFormat={}{0:0.#######}}"
 					 />
 			
 			<TextBlock Text="Longitude:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" Margin="0 5 0 0"/>
 			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Margin="10 5 0 0" IsReadOnly="True"
-					 Text="{Binding TrackedVehicle.Longitude, Mode=OneWay, Converter={StaticResource RadiansToDegreesLocationConverter}, StringFormat={}{0:#.#######}}"
+					 Text="{Binding TrackedVehicle.Longitude, Mode=OneWay, Converter={StaticResource RadiansToDegreesLocationConverter}, StringFormat={}{0:0.#######}}"
 					 />
 
 			<TextBlock Text="Altitude AMSL" VerticalAlignment="Center" Grid.Column="0" Grid.Row="2" Margin="0 5 0 0"/>
 			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="2" Margin="10 5 0 0" IsReadOnly="True"
-					 Text="{Binding TrackedVehicle.Altitude, Mode=OneWay, StringFormat={}{0:#.##}}"
+					 Text="{Binding TrackedVehicle.Altitude, Mode=OneWay, StringFormat={}{0:0.##}}"
 					 />
 
 			<TextBlock Text="Azimuth:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="3" Margin="0 5 0 0"/>

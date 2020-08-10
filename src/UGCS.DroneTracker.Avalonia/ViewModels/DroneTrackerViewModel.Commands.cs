@@ -159,9 +159,12 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
         private void doStopPositioning()
         {
             _logger.LogInfoMessage("doStopPositioning requested");
-            _ptzController.Stop(getAppSettings.PTZDeviceAddress);
 
-            DroneTracker.UpdateCurrentPosition();
+            var deviceAddress = getAppSettings.PTZDeviceAddress;
+
+            _ptzController.Stop(deviceAddress);
+
+            DroneTracker.UpdateCurrentPosition(deviceAddress);
         }
 
 
