@@ -44,7 +44,8 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
         public List<WiresProtectionMode> WiresProtectionModes { get; set; } = new List<WiresProtectionMode>()
         {
             WiresProtectionMode.Disabled,
-            WiresProtectionMode.AllRound
+            WiresProtectionMode.AllRound,
+            WiresProtectionMode.DeadZone
         };
 
 

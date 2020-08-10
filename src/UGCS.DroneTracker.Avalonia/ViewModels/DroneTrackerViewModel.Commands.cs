@@ -22,7 +22,7 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
         public ReactiveCommand<Unit, Unit> SetNorthFromCurrentCommand { get; set; }
         public ReactiveCommand<Unit, Unit> SetPTZInitialLocationFromDroneCommand { get; set; }
         public ReactiveCommand<Unit, Unit> ToggleManualControl { get; set; }
-        public ReactiveCommand<Unit, Unit> ResetWiresProtectionCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> ResetTotalRotationCommand { get; set; }
 
         private void createCommands()
         {
@@ -72,13 +72,13 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
             ToggleManualControl =
                 ReactiveCommand.Create(this.doToggleManualControl, canCommandsBlockedByTrackingExecuted);
 
-            ResetWiresProtectionCommand =
-                ReactiveCommand.Create(this.doResetWiresProtection, canCommandsBlockedByTrackingExecuted);
+            ResetTotalRotationCommand =
+                ReactiveCommand.Create(this.doResetTotalRotation, canCommandsBlockedByTrackingExecuted);
         }
 
-        private void doResetWiresProtection()
+        private void doResetTotalRotation()
         {
-            this.DroneTracker.ResetWiresProtection();
+            this.DroneTracker.ResetTotalRotation();
         }
 
 

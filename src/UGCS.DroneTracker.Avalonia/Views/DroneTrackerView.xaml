@@ -170,7 +170,7 @@
 		</StackPanel>
 
 
-		<Grid DockPanel.Dock="Top" ColumnDefinitions="*,*, 34" RowDefinitions="Auto, Auto, Auto" 
+		<Grid DockPanel.Dock="Top" ColumnDefinitions="*,*, 34" RowDefinitions="Auto, Auto, Auto, Auto" 
 			  Margin="10 0 0 0">
 
 			<TextBlock Text="Latitude:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0" Margin="0 5 0 0"/>
@@ -188,6 +188,12 @@
 			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="2" Margin="10 5 0 0" IsReadOnly="True"
 					 Text="{Binding TrackedVehicle.Altitude, Mode=OneWay, StringFormat={}{0:#.##}}"
 					 />
+
+			<TextBlock Text="Azimuth:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="3" Margin="0 5 0 0"/>
+			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="3" Margin="10 5 0 0" IsReadOnly="True" IsEnabled="{Binding IsTrackingEnabled}"
+					 Text="{Binding DroneTracker.TargetAzimuth, Mode=OneWay, StringFormat={}{0:0.##}}"
+					 />
+
 		</Grid>
 
 		<StackPanel Classes="HR" DockPanel.Dock="Top">
@@ -210,17 +216,12 @@
 					 Text="{Binding DroneTracker.CurrentPlatformTilt, Mode=OneWay, StringFormat={}{0:0.##}}"
 					 />
 
-			<TextBlock Text="Azimuth:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="2" Margin="0 5 0 0"/>
-			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="2" Margin="10 5 0 0" IsReadOnly="True"
-					 Text="{Binding DroneTracker.TargetAzimuth, Mode=OneWay, StringFormat={}{0:0.##}}"
-					 />
-
-			<TextBlock Text="Wires angle:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="3" Margin="0 5 0 0"/>
+			<TextBlock Text="Total rotation:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="3" Margin="0 5 0 0"/>
 			<TextBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="3" Margin="10 0 0 0" IsReadOnly="True"
-					 Text="{Binding DroneTracker.TwistedWiresAngle, Mode=OneWay, StringFormat={}{0:0.##}}"
+					 Text="{Binding DroneTracker.TotalRotationAngle, Mode=OneWay, StringFormat={}{0:0.##}}"
 					 />
 			<Button Classes="IconButton" Grid.Column="2" Grid.Row="3" 
-					Command="{Binding ResetWiresProtectionCommand}" ToolTip.Tip="Reset twisted wires angle"
+					Command="{Binding ResetTotalRotationCommand}" ToolTip.Tip="Reset total rotation angle"
 					Margin="0 5 0 0" HorizontalAlignment="Center" VerticalAlignment="Center">
 				<Path VerticalAlignment="Center" Width="24" Height="24" Margin="0 0 0 0" Data="M19,8L15,12H18A6,6 0 0,1 12,18C11,18 10.03,17.75 9.2,17.3L7.74,18.76C8.97,19.54 10.43,20 12,20A8,8 0 0,0 20,12H23M6,12A6,6 0 0,1 12,6C13,6 13.97,6.25 14.8,6.7L16.26,5.24C15.03,4.46 13.57,4 12,4A8,8 0 0,0 4,12H1L5,16L9,12" />
 			</Button>

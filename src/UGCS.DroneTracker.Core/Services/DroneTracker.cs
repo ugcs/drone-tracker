@@ -15,21 +15,24 @@ namespace UGCS.DroneTracker.Core.Services
     {
         double CurrentPlatformTilt { get; }
         double CurrentPlatformPan { get; }
-        double TwistedWiresAngle { get; }
+        double TotalRotationAngle { get; }
 
         void StartTrack(DroneTrackerSettings trackSettings);
         void StopTrack();
 
-        void ResetWiresProtection();
-        void UpdateCurrentPosition();
+        void ResetTotalRotation();
+        Task<bool> UpdateCurrentPosition();
     }
     
     public class DroneTracker : INotifyPropertyChanged, IDroneTracker
     {
         private readonly IApplicationLogger _logger = DefaultApplicationLogger.GetLogger<DroneTracker>();
 
-        private const int MAX_ANGLE_TO_TWIST_WIRES_CORRECTION = 360;
-        private const int TWIST_WIRES_CORRECTION_INTERMEDIATE_ANGLE = 179;
+        private const int MAX_ANGLE_TO_ALLROUND_TWIST_WIRES_CORRECTION = 360;
+        private const int ALLROUND_TWIST_WIRES_CORRECTION_INTERMEDIATE_ANGLE = 179;
+
+        private const int MAX_ANGLE_TO_DEADZONE_WIRES_PROTECTION = 179;
+
         private readonly IQueryablePTZDeviceController _ptzController;
 
         private double? _altitude;
@@ -49,7 +52,7 @@ namespace UGCS.DroneTracker.Core.Services
         private bool _isTrackStarted;
         private WiresProtectionMode _isWiresProtectionMode;
 
-        private double _twistedWiresAngle;
+        private double _totalRotationAngle;
         private double _currentPlatformTilt;
         private double _currentPlatformPan;
         private Task _twistedWirePanCorrectionTask;
@@ -59,14 +62,15 @@ namespace UGCS.DroneTracker.Core.Services
         private double _minTiltChangedThreshold;
         private double _targetAzimuth;
         private double _panSpeed;
+        
 
 
-        private double TwistedWiresZeroAngle { get; set; }
+        private double TotalRotationZeroAngle { get; set; }
 
-        public double TwistedWiresAngle
+        public double TotalRotationAngle
         {
-            get => _twistedWiresAngle;
-            private set { _twistedWiresAngle = value; OnPropertyChanged(); }
+            get => _totalRotationAngle;
+            private set { _totalRotationAngle = value; OnPropertyChanged(); }
         }
 
         public double CurrentPlatformTilt
@@ -166,27 +170,44 @@ namespace UGCS.DroneTracker.Core.Services
                         break;
                     case WiresProtectionMode.AllRound:
 
-                        TwistedWiresAngle = calcNewTwistedWiresAngle(CurrentPlatformPan, newPlatformPan, TwistedWiresAngle);
-                        _logger.LogInfoMessage($"processTelemetry => twisted wires protection: twisted angle={TwistedWiresAngle}");
+                        TotalRotationAngle = calcOverallTwistedWiresAngle(CurrentPlatformPan, newPlatformPan, TotalRotationAngle);
+                        _logger.LogInfoMessage($"processTelemetry => (AllRound) twisted wires protection: twisted angle={TotalRotationAngle}");
 
-                        if (Math.Abs(TwistedWiresAngle) < MAX_ANGLE_TO_TWIST_WIRES_CORRECTION)
+                        if (Math.Abs(TotalRotationAngle) < MAX_ANGLE_TO_ALLROUND_TWIST_WIRES_CORRECTION)
                         {
                             CurrentPlatformPan = newPlatformPan;
                             _ptzController?.PanTo(_ptzDeviceAddress, CurrentPlatformPan);
                         }
                         else
                         {
-                            _logger.LogInfoMessage($"processTelemetry => start twisted wires protection task");
-                            _twistedWirePanCorrectionTask = Task.Factory.StartNew(() => doTwistWiresPanCorrection(newPlatformPan))
+                            _logger.LogInfoMessage($"processTelemetry => (AllRound) start twisted wires protection task");
+                            _twistedWirePanCorrectionTask = Task.Factory.StartNew(() => doAllRoundTwistWiresPanCorrection(newPlatformPan))
                                 .ContinueWith(task =>
                                 {
-                                    _logger.LogInfoMessage($"processTelemetry => twisted wires protection task completed");
+                                    _logger.LogInfoMessage($"processTelemetry => (AllRound) twisted wires protection task completed");
                                     _twistedWirePanCorrectionTask = null;
                                 });
                         }
 
 
                         break;
+
+                    case WiresProtectionMode.DeadZone:
+
+                        TotalRotationAngle = calcTwistedWiresAngle(TotalRotationZeroAngle, newPlatformPan);
+
+                        if (Math.Abs(TotalRotationAngle) < MAX_ANGLE_TO_DEADZONE_WIRES_PROTECTION / 2.0)
+                        {
+                            CurrentPlatformPan = newPlatformPan;
+                            _ptzController?.PanTo(_ptzDeviceAddress, CurrentPlatformPan);
+                        }
+                        else
+                        {
+                            _logger.LogInfoMessage($"processTelemetry => (DeadZone) Current calculated pan out of deadzone range. Pan was ignored: twistedWiresAngle={TotalRotationAngle} Requested pan={newPlatformPan}");
+                        }
+
+                        break;
+
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -202,14 +223,14 @@ namespace UGCS.DroneTracker.Core.Services
             }
         }
 
-        private void doTwistWiresPanCorrection(double newPlatformPan)
+        private void doAllRoundTwistWiresPanCorrection(double newPlatformPan)
         {
-            _logger.LogInfoMessage($"doTwistWiresPanCorrection requested");
+            _logger.LogInfoMessage($"doAllRoundTwistWiresPanCorrection requested");
 
             var wiresCorrectionIntermediateAngle = CurrentPlatformPan;
-            if (TwistedWiresAngle > 0)
+            if (TotalRotationAngle > 0)
             {
-                wiresCorrectionIntermediateAngle -= TWIST_WIRES_CORRECTION_INTERMEDIATE_ANGLE;
+                wiresCorrectionIntermediateAngle -= ALLROUND_TWIST_WIRES_CORRECTION_INTERMEDIATE_ANGLE;
                 if (wiresCorrectionIntermediateAngle < 0)
                 {
                     wiresCorrectionIntermediateAngle = 360 + wiresCorrectionIntermediateAngle;
@@ -217,34 +238,35 @@ namespace UGCS.DroneTracker.Core.Services
             }
             else
             {
-                wiresCorrectionIntermediateAngle += TWIST_WIRES_CORRECTION_INTERMEDIATE_ANGLE;
+                wiresCorrectionIntermediateAngle += ALLROUND_TWIST_WIRES_CORRECTION_INTERMEDIATE_ANGLE;
                 if (wiresCorrectionIntermediateAngle >= 360)
                 {
                     wiresCorrectionIntermediateAngle = 360 - wiresCorrectionIntermediateAngle;
                 }
             }
-            _logger.LogDebugMessage($"doTwistWiresPanCorrection: Intermediate rotation => currentPan={CurrentPlatformPan}, interAngle={wiresCorrectionIntermediateAngle}");
+            _logger.LogDebugMessage($"doAllRoundTwistWiresPanCorrection: Intermediate rotation => currentPan={CurrentPlatformPan}, interAngle={wiresCorrectionIntermediateAngle}");
             
             CurrentPlatformPan = wiresCorrectionIntermediateAngle;
 
+            // TODO make setting for devices supported set pan complete response
             //_ptzController?.PanToAsync(_ptzDeviceAddress, CurrentPlatformPan)
             //    .GetAwaiter()
             //    .GetResult();
 
             _ptzController?.PanTo(_ptzDeviceAddress, CurrentPlatformPan);
 
-            var waitingDelay = (int) (TWIST_WIRES_CORRECTION_INTERMEDIATE_ANGLE / _panSpeed * 1000);
-            _logger.LogDebugMessage($"doTwistWiresPanCorrection: Waiting to Intermediate rotation complete: delay={waitingDelay} ms");
+            var waitingDelay = (int) (ALLROUND_TWIST_WIRES_CORRECTION_INTERMEDIATE_ANGLE / _panSpeed * 1000);
+            _logger.LogDebugMessage($"doAllRoundTwistWiresPanCorrection: Waiting to Intermediate rotation complete: delay={waitingDelay} ms");
             Task.Delay(waitingDelay).Wait();
 
             
-            _logger.LogDebugMessage($"doTwistWiresPanCorrection: Intermediate rotation completed");
+            _logger.LogDebugMessage($"doAllRoundTwistWiresPanCorrection: Intermediate rotation completed");
 
-            TwistedWiresAngle = calcNewTwistedWiresAngle(TwistedWiresZeroAngle, newPlatformPan, currentTwistAngle: 0);
+            TotalRotationAngle = calcOverallTwistedWiresAngle(TotalRotationZeroAngle, newPlatformPan, currentTwistAngle: 0);
 
             var anglesDelta = getAnglesDelta(CurrentPlatformPan, newPlatformPan);
 
-            _logger.LogDebugMessage($"doTwistWiresPanCorrection: finishing rotation => currentPan={CurrentPlatformPan}, interAngle={newPlatformPan}, anglesDelta={anglesDelta}");
+            _logger.LogDebugMessage($"doAllRoundTwistWiresPanCorrection: finishing rotation => currentPan={CurrentPlatformPan}, interAngle={newPlatformPan}, anglesDelta={anglesDelta}");
 
 
             //_ptzController?.PanToAsync(_ptzDeviceAddress, newPlatformPan)
@@ -254,12 +276,12 @@ namespace UGCS.DroneTracker.Core.Services
 
             _ptzController?.PanTo(_ptzDeviceAddress, newPlatformPan);
             waitingDelay = (int)(anglesDelta / _panSpeed * 1000);
-            _logger.LogDebugMessage($"doTwistWiresPanCorrection: Waiting to finishing rotation complete: delay={waitingDelay} ms");
+            _logger.LogDebugMessage($"doAllRoundTwistWiresPanCorrection: Waiting to finishing rotation complete: delay={waitingDelay} ms");
             Task.Delay(waitingDelay).Wait();
 
             CurrentPlatformPan = newPlatformPan;
 
-            _logger.LogDebugMessage($"doTwistWiresPanCorrection: finishing rotation completed");
+            _logger.LogDebugMessage($"doAllRoundTwistWiresPanCorrection: finishing rotation completed");
         }
 
 
@@ -296,12 +318,13 @@ namespace UGCS.DroneTracker.Core.Services
             _isTrackStarted = false;
         }
 
-        public void ResetWiresProtection()
+        public void ResetTotalRotation()
         {
-            TwistedWiresAngle = 0;
+            TotalRotationAngle = 0;
+            TotalRotationZeroAngle = CurrentPlatformPan;
         }
 
-        public async void UpdateCurrentPosition()
+        public async Task<bool> UpdateCurrentPosition()
         {
             try
             {
@@ -309,6 +332,7 @@ namespace UGCS.DroneTracker.Core.Services
                 CurrentPlatformPan = ptzPan;
                 var ptzTilt = await _ptzController.RequestTiltAngleAsync(_ptzDeviceAddress);
                 CurrentPlatformTilt = ptzTilt;
+                return true;
             }
             catch (TaskCanceledException)
             {
@@ -318,6 +342,8 @@ namespace UGCS.DroneTracker.Core.Services
             {
                 _logger.LogException(ex);
             }
+
+            return false;
         }
 
         private double getAnglesDelta(double startAngle, double endAngle)
@@ -336,7 +362,12 @@ namespace UGCS.DroneTracker.Core.Services
             return rotationAngle;
         }
 
-        private double calcNewTwistedWiresAngle(double startRotationAngle, double endRotationAngle, double currentTwistAngle)
+        private double calcTwistedWiresAngle(double startRotationAngle, double endRotationAngle)
+        {
+            return calcOverallTwistedWiresAngle(startRotationAngle, endRotationAngle, currentTwistAngle: 0);
+        }
+
+        private double calcOverallTwistedWiresAngle(double startRotationAngle, double endRotationAngle, double currentTwistAngle)
         {
             var startAngleRad = startRotationAngle * LocationUtils.DEGREES_TO_RADIANS;
             var startSin = Math.Sin(startAngleRad);

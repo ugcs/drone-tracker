@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Threading.Tasks;
 using Ninject;
 using ReactiveUI;
 using UGCS.DroneTracker.Avalonia.Models;
@@ -97,16 +98,27 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
                     .DisposeWith(disposables);
 
                 this.WhenAnyValue(vm => vm.ConnectionStatusViewModel.IsPTZConnected)
-                    .Subscribe(isPtzConnected => onPtzConnectedStatusChanged(isPtzConnected))
+                    .Subscribe(isPtzConnected => onPtzConnectedStatusChanged(isPtzConnected: isPtzConnected))
                     .DisposeWith(disposables);
             });
         }
 
-        private void onPtzConnectedStatusChanged(in bool isPtzConnected)
+        private void onPtzConnectedStatusChanged(bool isPtzConnected)
         {
             if (isPtzConnected)
             {
-                this.DroneTracker.UpdateCurrentPosition();
+                Task.Factory.StartNew(async () =>
+                {
+                    var updatePositionSuccess = await this.DroneTracker.UpdateCurrentPosition();
+                    if (updatePositionSuccess)
+                    {
+                        this.DroneTracker.ResetTotalRotation();
+                    }
+                    else
+                    {
+                        ConnectionStatusViewModel.IsPTZConnected = false;
+                    }
+                });
             }
         }
 
