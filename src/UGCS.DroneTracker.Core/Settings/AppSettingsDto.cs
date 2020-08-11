@@ -12,7 +12,8 @@ namespace UGCS.DroneTracker.Core.Settings
     public enum WiresProtectionMode
     {
         Disabled = 0,
-        AllRound = 1
+        AllRound = 1,
+        DeadZone = 2
     }
 
     public interface IAppSettings {}
@@ -54,8 +55,8 @@ namespace UGCS.DroneTracker.Core.Settings
         public double MinimalPanChangedThreshold { get; set; } = 1d;
         public double MinimalTiltChangedThreshold { get; set; } = 1d;
 
-        public double PTZPanAngleToCoordinatesFactor { get; set; } = 1.12d;
-        public double PTZTiltAngleToCoordinatesFactor { get; set; } = 1.75d;
+        public double PTZPanAngleToCoordinateFactor { get; set; } = 1; //1.12d;
+        public double PTZTiltAngleToCoordinateFactor { get; set; } = 1; //1.75d;
 
         public double PTZMaxSpeed { get; set; } = 0x3F;
 
@@ -72,6 +73,9 @@ namespace UGCS.DroneTracker.Core.Settings
         public double PTZMaxTiltCoordinate { get; set; } = 236.25;
 
         public WiresProtectionMode WiresProtection { get; set; } = WiresProtectionMode.AllRound;
+
+        // TODO rename to PanAngleSpeed
+        public double PanSpeed { get; set; } = 30.0;
 
         public Dictionary<PelcoDEMessageType, byte> PelcoCodesMapping { get; set; } =
             DefaultPelcoCodesMappingFactory.CodesMapping;

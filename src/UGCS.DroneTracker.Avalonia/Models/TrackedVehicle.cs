@@ -9,13 +9,13 @@ namespace UGCS.DroneTracker.Avalonia.Models
         private double? _altitude;
         private double? _latitude;
         private double? _longitude;
-        
-        private Vehicle _vehicle { get; set; }
 
         public TrackedVehicle(Vehicle vehicle)
         {
-            _vehicle = vehicle;
+            Vehicle = vehicle;
         }
+
+        public Vehicle Vehicle { get; }
 
         public bool IsConnected
         {

@@ -27,8 +27,6 @@ namespace UGCS.DroneTracker.Avalonia
 
             Bind<IApplicationSettingsManager>().To<ApplicationSettingsManager>().InSingletonScope();
 
-            //Bind<MainWindowViewModel>().ToSelf().InSingletonScope();
-
             _mainWindowVM = new MainWindowViewModel();
             
             Bind<IScreen>().ToConstant(_mainWindowVM).InSingletonScope();
@@ -37,15 +35,6 @@ namespace UGCS.DroneTracker.Avalonia
             Bind<DroneTrackerViewModel>().ToSelf().InSingletonScope();
             Bind<SettingsViewModel>().ToSelf().InSingletonScope();
             Bind<ConnectionStatusViewModel>().ToSelf().InSingletonScope();
-
-            //Bind<TcpClient>().ToSelf().InSingletonScope();
-            //Bind<MessageSender>().ToSelf().InSingletonScope();
-            //Bind<MessageReceiver>().ToSelf().InSingletonScope();
-            //Bind<MessageExecutor>().ToSelf().InSingletonScope()
-            //    .OnActivation((executor) => executor.Configuration.DefaultTimeout = 10 * 1000);
-            //Bind<TelemetrySubscription>().ToSelf().InSingletonScope();
-            //Bind<ObjectModificationSubscription>().ToSelf().InSingletonScope();
-            //Bind<EventSubscriptionWrapper>().ToSelf().InSingletonScope();
 
             Bind<UGCSConnection>().ToSelf().InSingletonScope();
             Bind<UGCSFacade>().ToSelf().InSingletonScope();

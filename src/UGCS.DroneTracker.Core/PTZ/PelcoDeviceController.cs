@@ -80,7 +80,7 @@ namespace UGCS.DroneTracker.Core.PTZ
                     return;
                 case PelcoDEMessageType.RequestPanResponse:
                 {
-                    var panAngleToCoordinatesFactor = settings.PTZPanAngleToCoordinatesFactor;
+                    var panAngleToCoordinatesFactor = settings.PTZPanAngleToCoordinateFactor;
                     var angle = PelcoResponseDecoder.GetUInt16(pelcoMessage) / panAngleToCoordinatesFactor / 100;
                     _panRequestCTS.Dispose();
                     _requestPanTaskCompletionSource?.TrySetResult(angle);
@@ -88,7 +88,7 @@ namespace UGCS.DroneTracker.Core.PTZ
                 }
                 case PelcoDEMessageType.RequestTiltResponse:
                 {
-                    var tiltAngleToCoordinatesFactor = settings.PTZTiltAngleToCoordinatesFactor;
+                    var tiltAngleToCoordinatesFactor = settings.PTZTiltAngleToCoordinateFactor;
                     var angle = PelcoResponseDecoder.GetUInt16(pelcoMessage) / tiltAngleToCoordinatesFactor / 100;
                     _tiltRequestCTS.Dispose();
                     _requestTiltTaskCompletionSource?.TrySetResult(angle);
@@ -113,7 +113,7 @@ namespace UGCS.DroneTracker.Core.PTZ
         public Task<bool> PanToAsync(byte address, double angle)
         {
             var settings = _settingsManager.GetAppSettings();
-            var panAngleToCoordinatesFactor = settings.PTZPanAngleToCoordinatesFactor;
+            var panAngleToCoordinatesFactor = settings.PTZPanAngleToCoordinateFactor;
             _panTaskCompletionSource = new TaskCompletionSource<bool>();
 
             var message = _requestBuilder.SetPan(address, (int)(angle * panAngleToCoordinatesFactor * 100d));
@@ -133,7 +133,7 @@ namespace UGCS.DroneTracker.Core.PTZ
         public void PanTo(byte address, double angle)
         {
             var settings = _settingsManager.GetAppSettings();
-            var panAngleToCoordinatesFactor = settings.PTZPanAngleToCoordinatesFactor;
+            var panAngleToCoordinatesFactor = settings.PTZPanAngleToCoordinateFactor;
             var message = _requestBuilder.SetPan(address, (int)(angle * panAngleToCoordinatesFactor * 100d));
             _logger.LogDebugMessage($"PanTo {angle} * {panAngleToCoordinatesFactor} => {message}");
             _transport.SendMessage(message);
@@ -143,7 +143,7 @@ namespace UGCS.DroneTracker.Core.PTZ
         public void TiltTo(byte address, double angle)
         {
             var settings = _settingsManager.GetAppSettings();
-            var tiltAngleToCoordinatesFactor = settings.PTZTiltAngleToCoordinatesFactor;
+            var tiltAngleToCoordinatesFactor = settings.PTZTiltAngleToCoordinateFactor;
 
             var message = _requestBuilder.SetTilt(address, (int)(angle * tiltAngleToCoordinatesFactor * 100d));
             _logger.LogDebugMessage($"TiltTo {angle} * {tiltAngleToCoordinatesFactor} => {message}");

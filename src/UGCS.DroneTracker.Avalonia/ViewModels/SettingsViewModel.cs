@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Reactive;
+using AutoMapper;
 using ReactiveUI;
 using UGCS.DroneTracker.Core.Settings;
 
@@ -7,18 +8,21 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
 {
     public class SettingsViewModel : ViewModelBase, IRoutableViewModel
     {
+        private readonly IApplicationSettingsManager _settingsManager;
+        private readonly MapperConfiguration _mapperConfig;
+
+
         private string _ugcsHost;
         private int _ugcsPort;
         private string _ugcsLogin;
         private string _ugcsPassword;
         private string _ptzUdpHost;
         private int _ptzUdpPort;
-        private readonly IApplicationSettingsManager _settingsManager;
 
         private string _ptzSerialPortName;
         private int _ptzSerialPortSpeed;
         private byte _ptzDeviceAddress;
-        private PTZDeviceTransportType _ptzDeviceTransportType;
+        private PTZDeviceTransportType _ptzTransportType;
         private double _ptzMaxSpeed;
         private double _ptzPanAngleToCoordinateFactor;
         private double _ptzTiltAngleToCoordinateFactor;
@@ -29,6 +33,8 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
         private double _ptzMaxPanAngle;
         private double _ptzMinPanAngle;
         private WiresProtectionMode _wiresProtection;
+        private double _panSpeed;
+        
 
         public string UrlPathSegment => "Settings";
 
@@ -43,7 +49,8 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
         public List<WiresProtectionMode> WiresProtectionModes { get; set; } = new List<WiresProtectionMode>()
         {
             WiresProtectionMode.Disabled,
-            WiresProtectionMode.AllRound
+            WiresProtectionMode.AllRound,
+            WiresProtectionMode.DeadZone
         };
 
 
@@ -105,10 +112,10 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
             set => this.RaiseAndSetIfChanged(ref _ptzDeviceAddress, value);
         }
 
-        public PTZDeviceTransportType PtzDeviceTransportType
+        public PTZDeviceTransportType PTZTransportType
         {
-            get => _ptzDeviceTransportType;
-            set => this.RaiseAndSetIfChanged(ref _ptzDeviceTransportType, value);
+            get => _ptzTransportType;
+            set => this.RaiseAndSetIfChanged(ref _ptzTransportType, value);
         }
 
         public double PTZMaxSpeed
@@ -171,85 +178,34 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
             set => this.RaiseAndSetIfChanged(ref _wiresProtection, value);
         }
 
-        public SettingsViewModel(IScreen hostScreen, IApplicationSettingsManager settingsManager)
+        public double PanSpeed
+        {
+            get => _panSpeed;
+            set => this.RaiseAndSetIfChanged(ref _panSpeed, value);
+        }
+
+        public SettingsViewModel(IScreen hostScreen, IApplicationSettingsManager settingsManager, MapperConfiguration mapperConfig)
         {
             HostScreen = hostScreen;
             _settingsManager = settingsManager;
+            _mapperConfig = mapperConfig;
 
             ApplyAndGoBackCommand = ReactiveCommand.Create(doApplyAndGoBack);
 
             var settings = (AppSettingsDto)_settingsManager.GetAppSettings();
 
-            UGCSHost = settings.UGCSHost;
-            UGCSPort = settings.UGCSPort;
-            UGCSLogin = settings.UGCSLogin;
-            UGCSPassword = settings.UGCSPassword;
-
-            PTZDeviceAddress = settings.PTZDeviceAddress;
-
-            PtzDeviceTransportType = settings.PTZTransportType;
-
-            PTZUdpHost = settings.PTZUdpHost;
-            PTZUdpPort = settings.PTZUdpPort;
-
-            PTZSerialPortName = settings.PTZSerialPortName;
-            PTZSerialPortSpeed = settings.PTZSerialPortSpeed;
-
-            PTZMaxSpeed = settings.PTZMaxSpeed;
-
-            PTZMinPanAngle = settings.PTZMinPanAngle;
-            PTZMaxPanAngle = settings.PTZMaxPanAngle;
-
-            PTZMinTiltAngle = settings.PTZMinTiltAngle;
-            PTZMaxTiltAngle = settings.PTZMaxTiltAngle;
-
-            PTZMaxPanCoordinate = settings.PTZMaxPanCoordinate;
-            PTZMaxTiltCoordinate = settings.PTZMaxTiltCoordinate;
-
-            PTZPanAngleToCoordinateFactor = settings.PTZPanAngleToCoordinatesFactor;
-            PTZTiltAngleToCoordinateFactor = settings.PTZTiltAngleToCoordinatesFactor;
-
-            WiresProtection = settings.WiresProtection;
+            _mapperConfig.CreateMapper().Map<AppSettingsDto, SettingsViewModel>(settings, this);
         }
 
 
 
         private void doApplyAndGoBack()
         {
-            var settings = (AppSettingsDto)_settingsManager.GetAppSettings();
+            var appSettingsDto = (AppSettingsDto)_settingsManager.GetAppSettings();
 
-            settings.UGCSHost = UGCSHost;
-            settings.UGCSPort = UGCSPort;
-            settings.UGCSLogin = UGCSLogin;
-            settings.UGCSPassword = UGCSPassword;
+            _mapperConfig.CreateMapper().Map<SettingsViewModel, AppSettingsDto>(this, appSettingsDto);
 
-            settings.PTZDeviceAddress = PTZDeviceAddress;
-            settings.PTZTransportType = PtzDeviceTransportType;
-
-            settings.PTZUdpHost = PTZUdpHost;
-            settings.PTZUdpPort = PTZUdpPort;
-
-            settings.PTZSerialPortSpeed = PTZSerialPortSpeed;
-            settings.PTZSerialPortName = PTZSerialPortName;
-
-            settings.PTZMaxSpeed = PTZMaxSpeed;
-
-            settings.PTZMinPanAngle = PTZMinPanAngle;
-            settings.PTZMaxPanAngle = PTZMaxPanAngle;
-
-            settings.PTZMinTiltAngle = PTZMinTiltAngle;
-            settings.PTZMaxTiltAngle = PTZMaxTiltAngle;
-
-            settings.PTZMaxPanCoordinate = PTZMaxPanCoordinate;
-            settings.PTZMaxTiltCoordinate = PTZMaxTiltCoordinate;
-
-
-            settings.PTZPanAngleToCoordinatesFactor = PTZPanAngleToCoordinateFactor;
-            settings.PTZTiltAngleToCoordinatesFactor = PTZTiltAngleToCoordinateFactor;
-
-            settings.WiresProtection = WiresProtection;
-
-            _settingsManager.Save(settings);
+            _settingsManager.Save(appSettingsDto);
 
             GoBackCommand.Execute();
         }

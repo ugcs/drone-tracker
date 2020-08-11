@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Threading.Tasks;
 using Ninject;
 using ReactiveUI;
 using UGCS.DroneTracker.Avalonia.Models;
@@ -97,16 +98,27 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
                     .DisposeWith(disposables);
 
                 this.WhenAnyValue(vm => vm.ConnectionStatusViewModel.IsPTZConnected)
-                    .Subscribe(isPtzConnected => onPtzConnectedStatusChanged(isPtzConnected))
+                    .Subscribe(isPtzConnected => onPtzConnectedStatusChanged(isPtzConnected: isPtzConnected))
                     .DisposeWith(disposables);
             });
         }
 
-        private void onPtzConnectedStatusChanged(in bool isPtzConnected)
+        private void onPtzConnectedStatusChanged(bool isPtzConnected)
         {
             if (isPtzConnected)
             {
-                this.DroneTracker.UpdateCurrentPosition();
+                Task.Factory.StartNew(async () =>
+                {
+                    var updatePositionSuccess = await this.DroneTracker.UpdateCurrentPosition(_settingsManager.GetAppSettings().PTZDeviceAddress);
+                    if (updatePositionSuccess)
+                    {
+                        this.DroneTracker.ResetTotalRotation();
+                    }
+                    else
+                    {
+                        ConnectionStatusViewModel.IsPTZConnected = false;
+                    }
+                });
             }
         }
 
@@ -125,20 +137,20 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
 
         private void initViewModel()
         {
+            _logger.LogInfoMessage($"initViewModel requested");
             Vehicles.Clear();
             _vehiclesManager.Vehicles.ForEach(v => Vehicles.Add(v));
+            
             SelectedVehicle = _vehiclesManager.SelectedVehicle;
-            TrackedVehicle = new TrackedVehicle(SelectedVehicle)
-            {
-                IsConnected = _vehiclesManager.IsConnected(SelectedVehicle)
-            };
 
             var settings = getAppSettings;
             InitialPlatformLatitude = settings.InitialPlatformLat;
             InitialPlatformLongitude = settings.InitialPlatformLon;
             InitialPlatformAltitude = settings.InitialPlatformAlt;
+
             InitialPlatformTilt = settings.InitialPlatformTilt;
             InitialPlatformRoll = settings.InitialPlatformRoll;
+
             InitialNorthDirection = settings.InitialNorthDir;
 
             ZeroPTZPanAngle = settings.ZeroPTZPanAngle;
@@ -150,10 +162,25 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
             _logger.LogInfoMessage($"updateSelectedVehicle {vehicle?.Name}");
             SelectedVehicle = vehicle;
             _vehiclesManager.SelectedVehicle = vehicle;
-            TrackedVehicle = new TrackedVehicle(SelectedVehicle)
+
+            if (TrackedVehicle != null && vehicle != null && TrackedVehicle.Vehicle?.VehicleId == vehicle.VehicleId)
             {
-                IsConnected = _vehiclesManager.IsConnected(SelectedVehicle)
-            };
+                var tmpTrackedVehicle = TrackedVehicle;
+                TrackedVehicle = new TrackedVehicle(SelectedVehicle)
+                {
+                    IsConnected = _vehiclesManager.IsConnected(SelectedVehicle),
+                    Latitude = tmpTrackedVehicle.Latitude,
+                    Longitude = tmpTrackedVehicle.Longitude,
+                    Altitude = tmpTrackedVehicle.Altitude
+                };
+            }
+            else
+            {
+                TrackedVehicle = new TrackedVehicle(SelectedVehicle)
+                {
+                    IsConnected = _vehiclesManager.IsConnected(SelectedVehicle)
+                };
+            }
         }
 
         private void _vehiclesManager_SelectedVehicleChanged(object sender, Vehicle vehicle)
