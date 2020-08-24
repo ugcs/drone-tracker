@@ -22,10 +22,10 @@ namespace UGCS.DroneTracker.Core.Settings
     {
         public string UGCSHost { get; set; } = "localhost";
         public int UGCSPort { get; set; } = 3334;
-        public string UGCSLogin { get; set; } = "login";
+        public string UGCSLogin { get; set; } = "admin";
         
         // TODO do not store in plain text
-        public string UGCSPassword { get; set; } = "password";
+        public string UGCSPassword { get; set; } = "admin";
 
         public PTZDeviceTransportType PTZTransportType { get; set; } = PTZDeviceTransportType.Serial;
 
@@ -74,7 +74,6 @@ namespace UGCS.DroneTracker.Core.Settings
 
         public WiresProtectionMode WiresProtection { get; set; } = WiresProtectionMode.AllRound;
 
-        // TODO rename to PanAngleSpeed
         public double PanSpeed { get; set; } = 30.0;
 
         public Dictionary<PelcoDEMessageType, byte> PelcoCodesMapping { get; set; } =

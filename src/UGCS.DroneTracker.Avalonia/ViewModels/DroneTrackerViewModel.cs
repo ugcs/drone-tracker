@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Ninject;
 using ReactiveUI;
 using UGCS.DroneTracker.Avalonia.Models;
@@ -144,6 +145,7 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
             SelectedVehicle = _vehiclesManager.SelectedVehicle;
 
             var settings = getAppSettings;
+
             InitialPlatformLatitude = settings.InitialPlatformLat;
             InitialPlatformLongitude = settings.InitialPlatformLon;
             InitialPlatformAltitude = settings.InitialPlatformAlt;
@@ -155,6 +157,8 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
 
             ZeroPTZPanAngle = settings.ZeroPTZPanAngle;
             ZeroPTZTiltAngle = settings.ZeroPTZTiltAngle;
+
+            _logger.LogDebugMessage($"DroneTrackerViewModel initialize => appSettings:\n{JsonConvert.SerializeObject(settings, Formatting.Indented)}");
         }
 
         private void updateSelectedVehicle(Vehicle vehicle)

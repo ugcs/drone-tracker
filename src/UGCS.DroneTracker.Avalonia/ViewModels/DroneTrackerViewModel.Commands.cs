@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Reactive;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Ninject;
 using ReactiveUI;
 using UGCS.DroneTracker.Core.Helpers;
@@ -84,17 +85,21 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
 
         private void doGotoSettings()
         {
+            _logger.LogDebugMessage($"DroneTrackerViewModel doGotoSettings => viewModel props:\n{JsonConvert.SerializeObject(this, Formatting.Indented)}");
+
             // TODO do refactor
             var settings = _settingsManager.GetAppSettings();
-            settings.InitialPlatformLat = InitialPlatformLatitude;
-            settings.InitialPlatformLon = InitialPlatformLongitude;
-            settings.InitialPlatformAlt = InitialPlatformAltitude;
-            settings.InitialPlatformTilt = InitialPlatformTilt;
-            settings.InitialPlatformRoll = InitialPlatformRoll;
-            settings.InitialNorthDir = InitialNorthDirection;
+            settings.InitialPlatformLat = this.InitialPlatformLatitude;
+            settings.InitialPlatformLon = this.InitialPlatformLongitude;
+            settings.InitialPlatformAlt = this.InitialPlatformAltitude;
+            settings.InitialPlatformTilt = this.InitialPlatformTilt;
+            settings.InitialPlatformRoll = this.InitialPlatformRoll;
+            settings.InitialNorthDir = this.InitialNorthDirection;
 
-            settings.ZeroPTZPanAngle = ZeroPTZPanAngle;
-            settings.ZeroPTZTiltAngle = ZeroPTZTiltAngle;
+            settings.ZeroPTZPanAngle = this.ZeroPTZPanAngle;
+            settings.ZeroPTZTiltAngle = this.ZeroPTZTiltAngle;
+
+            _logger.LogDebugMessage($"DroneTrackerViewModel doGotoSettings => app settings :\n{JsonConvert.SerializeObject(settings, Formatting.Indented)}");
 
             _settingsManager.Save();
 
@@ -206,18 +211,27 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
 
             var settings = _settingsManager.GetAppSettings();
 
+            settings.InitialNorthDir = InitialNorthDirection;
+            settings.InitialPlatformLat = InitialPlatformLatitude;
+            settings.InitialPlatformLon = InitialPlatformLongitude;
+            settings.InitialPlatformAlt = InitialPlatformAltitude;
+            settings.InitialPlatformTilt = InitialPlatformTilt;
+            settings.InitialPlatformRoll = InitialPlatformRoll;
+
+            _settingsManager.Save(settings);
+
             var trackSettings = new DroneTrackerSettings
             {
                 PTZDeviceAddress = settings.PTZDeviceAddress,
 
-                InitialPlatformLatitude = InitialPlatformLatitude,
-                InitialPlatformLongitude = InitialPlatformLongitude,
-                InitialPlatformAltitude = InitialPlatformAltitude,
+                InitialPlatformLatitude = this.InitialPlatformLatitude,
+                InitialPlatformLongitude = this.InitialPlatformLongitude,
+                InitialPlatformAltitude = this.InitialPlatformAltitude,
 
-                InitialPlatformTilt = InitialPlatformTilt,
-                InitialPlatformRoll = InitialPlatformRoll,
+                InitialPlatformTilt = this.InitialPlatformTilt,
+                InitialPlatformRoll = this.InitialPlatformRoll,
 
-                InitialNorthDirection = InitialNorthDirection,
+                InitialNorthDirection = this.InitialNorthDirection,
 
                 MinimalPanChangedThreshold = settings.MinimalPanChangedThreshold,
                 MinimalTiltChangedThreshold = settings.MinimalTiltChangedThreshold,

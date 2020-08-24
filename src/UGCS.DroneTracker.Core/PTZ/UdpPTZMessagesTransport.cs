@@ -74,6 +74,19 @@ namespace UGCS.DroneTracker.Core.PTZ
         {
             MessageSending?.Invoke(this, message.DataBytes);
             _logger.LogInfoMessage($"Post message. Data: {BitConverter.ToString(message.DataBytes)}");
+
+
+            // for debug
+            //if (message.DataBytes[3] == 0x51)
+            //{
+            //    Task.Factory.StartNew(async () =>
+            //    {
+            //        await Task.Delay(1000);
+            //        byte[] sendBuffer = new byte[] { 0xff, 0x01, 0x00, 0x59, 0x08, 0x9c, 0xfe };
+            //        MessageReceived?.Invoke(this, sendBuffer);
+            //    });
+            //}
+
             var postResult = _udpClient.Post(message.DataBytes);
             if (!postResult)
             {

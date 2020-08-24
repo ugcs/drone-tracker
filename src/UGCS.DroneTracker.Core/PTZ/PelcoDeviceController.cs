@@ -82,6 +82,7 @@ namespace UGCS.DroneTracker.Core.PTZ
                 {
                     var panAngleToCoordinatesFactor = settings.PTZPanAngleToCoordinateFactor;
                     var angle = PelcoResponseDecoder.GetUInt16(pelcoMessage) / panAngleToCoordinatesFactor / 100;
+                    _logger.LogDebugMessage($"Pelco RequestPanResponse received => angle: {angle}");
                     _panRequestCTS.Dispose();
                     _requestPanTaskCompletionSource?.TrySetResult(angle);
                     return;
@@ -90,6 +91,7 @@ namespace UGCS.DroneTracker.Core.PTZ
                 {
                     var tiltAngleToCoordinatesFactor = settings.PTZTiltAngleToCoordinateFactor;
                     var angle = PelcoResponseDecoder.GetUInt16(pelcoMessage) / tiltAngleToCoordinatesFactor / 100;
+                    _logger.LogDebugMessage($"Pelco RequestTiltResponse received => angle: {angle}");
                     _tiltRequestCTS.Dispose();
                     _requestTiltTaskCompletionSource?.TrySetResult(angle);
                     return;

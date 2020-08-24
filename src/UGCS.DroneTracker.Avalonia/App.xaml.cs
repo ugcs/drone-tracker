@@ -9,6 +9,7 @@ using Avalonia.Markup.Xaml;
 using log4net;
 using log4net.Config;
 using log4net.Repository.Hierarchy;
+using Newtonsoft.Json;
 using Ninject;
 using UGCS.DroneTracker.Avalonia.ViewModels;
 using UGCS.DroneTracker.Avalonia.Views;
@@ -18,6 +19,8 @@ using UGCS.DroneTracker.Core.Services;
 using UGCS.DroneTracker.Core.Settings;
 using UGCS.DroneTracker.Core.UGCS;
 using ugcs_at.UGCS;
+using Newtonsoft.Json;
+using Formatting = Newtonsoft.Json.Formatting;
 
 namespace UGCS.DroneTracker.Avalonia
 {
@@ -28,7 +31,7 @@ namespace UGCS.DroneTracker.Avalonia
 
         public const string ApplicationDataFolderName = "UGCS-DroneTracker";
         private const string LogsFolder = "Logs";
-        private const int DaysForLogsDelete = 5;
+        private const int DaysForLogsDelete = 10;
 
         private readonly IApplicationLogger _logger = DefaultApplicationLogger.GetLogger<App>();
 
@@ -94,8 +97,11 @@ namespace UGCS.DroneTracker.Avalonia
 
         private async void Desktop_Startup(object sender, ControlledApplicationLifetimeStartupEventArgs e)
         {
-            _logger.LogInfoMessage("App startup begin");
+            var version = Assembly.GetEntryAssembly()?.GetName().Version;
+            _logger.LogInfoMessage($"App startup begin. version:{version}");
             var settings = _settingsManager.GetAppSettings();
+
+            _logger.LogInfoMessage($"App starting with user settings => :\n{JsonConvert.SerializeObject(settings, Formatting.Indented)}");
 
             _logger.LogInfoMessage("Connect to UGCS");
             await _ugcsConnection.ConnectAsync(settings.UGCSHost, settings.UGCSPort, settings.UGCSLogin, settings.UGCSPassword);
@@ -136,6 +142,8 @@ namespace UGCS.DroneTracker.Avalonia
 
             settings.ZeroPTZPanAngle = trackVm.ZeroPTZPanAngle;
             settings.ZeroPTZTiltAngle = trackVm.ZeroPTZTiltAngle;
+
+            _logger.LogInfoMessage($"App exit => app settings:\n{JsonConvert.SerializeObject(settings, Formatting.Indented)}");
 
             _settingsManager.Save();
 

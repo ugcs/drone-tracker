@@ -1,13 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Reactive;
 using AutoMapper;
+using Newtonsoft.Json;
 using ReactiveUI;
+using UGCS.DroneTracker.Core;
 using UGCS.DroneTracker.Core.Settings;
 
 namespace UGCS.DroneTracker.Avalonia.ViewModels
 {
     public class SettingsViewModel : ViewModelBase, IRoutableViewModel
     {
+        private readonly IApplicationLogger _logger = DefaultApplicationLogger.GetLogger<SettingsViewModel>();
+
         private readonly IApplicationSettingsManager _settingsManager;
         private readonly MapperConfiguration _mapperConfig;
 
@@ -195,6 +199,8 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
             var settings = (AppSettingsDto)_settingsManager.GetAppSettings();
 
             _mapperConfig.CreateMapper().Map<AppSettingsDto, SettingsViewModel>(settings, this);
+
+            _logger.LogDebugMessage($"SettingsViewModel ctor => app settings :\n{JsonConvert.SerializeObject(settings, Formatting.Indented)}");
         }
 
 
@@ -205,6 +211,8 @@ namespace UGCS.DroneTracker.Avalonia.ViewModels
 
             _mapperConfig.CreateMapper().Map<SettingsViewModel, AppSettingsDto>(this, appSettingsDto);
 
+            _logger.LogDebugMessage($"SettingsViewModel doApplyAndGoBack => app settings :\n{JsonConvert.SerializeObject(appSettingsDto, Formatting.Indented)}");
+            
             _settingsManager.Save(appSettingsDto);
 
             GoBackCommand.Execute();
