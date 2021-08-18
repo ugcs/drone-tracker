@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="AsyncNet.Udp" Version="1.2.5" />
-    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="log4net" Version="2.0.10" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="SerialPortLib" Version="1.0.19" />
     <PackageReference Include="ugcs-dotnet-sdk" Version="4.2.3" />
