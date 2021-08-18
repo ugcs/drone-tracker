@@ -18,7 +18,6 @@ using UGCS.DroneTracker.Core.PTZ;
 using UGCS.DroneTracker.Core.Services;
 using UGCS.DroneTracker.Core.Settings;
 using UGCS.DroneTracker.Core.UGCS;
-using ugcs_at.UGCS;
 using Newtonsoft.Json;
 using Formatting = Newtonsoft.Json.Formatting;
 

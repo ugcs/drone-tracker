@@ -140,7 +140,8 @@ namespace UGCS.DroneTracker.Core.Services
             var deltaHeight = _altitude.Value - _trackSettings.InitialPlatformAltitude;
             var tiltAngleRad = Math.Atan2(deltaHeight, distance);
             var modelPitch = Math.Round(tiltAngleRad * LocationUtils.RADIANS_TO_DEGREES, 2);
-            var newPlatformTilt = 90 - modelPitch - _trackSettings.InitialPlatformTilt;
+            
+            var newPlatformTilt = modelPitch - _trackSettings.InitialPlatformTilt;
 
 
             //_logger.LogDebugMessage($"Selected vehicle telemetry changed: lat:{_latitude}, lon:{_longitude}, alt:{_altitude}");

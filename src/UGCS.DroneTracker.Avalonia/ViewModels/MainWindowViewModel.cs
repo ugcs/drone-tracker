@@ -2,7 +2,6 @@
 using System.Reflection;
 using Ninject;
 using ReactiveUI;
-using ugcs_at;
 
 namespace UGCS.DroneTracker.Avalonia.ViewModels
 {

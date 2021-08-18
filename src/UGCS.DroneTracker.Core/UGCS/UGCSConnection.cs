@@ -7,7 +7,6 @@ using UGCS.DroneTracker.Core.Annotations;
 using UGCS.Sdk.Protocol;
 using UGCS.Sdk.Protocol.Encoding;
 using UGCS.Sdk.Tasks;
-using ugcs_at.UGCS;
 
 namespace UGCS.DroneTracker.Core.UGCS
 {

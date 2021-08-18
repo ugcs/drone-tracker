@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 using UGCS.Sdk.Protocol;
 
-namespace ugcs_at.UGCS
+namespace UGCS.DroneTracker.Core.UGCS
 {
     public static class LicenseHelper
     {

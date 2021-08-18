@@ -5,8 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UGCS.DroneTracker.Core.UGCS;
 using UGCS.Sdk.Protocol.Encoding;
-using ugcs_at.Services;
-using ugcs_at.UGCS;
+
 
 namespace UGCS.DroneTracker.Core.Services
 {

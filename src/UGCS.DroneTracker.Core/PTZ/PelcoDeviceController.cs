@@ -58,6 +58,9 @@ namespace UGCS.DroneTracker.Core.PTZ
             _settingsManager = settingsManager;
             _requestBuilder = requestBuilder;
             _responseDecoder = responseDecoder;
+
+            //GetPtzDeviceTiltCoordinatesImpl = PelcoDeviceController.DefaultGetPtzDeviceTiltCoordinatesImpl;
+            GetPtzDeviceTiltCoordinatesImpl = PelcoDeviceController.HDS3051GetPtzDeviceTiltCoordinatesImpl;
         }
 
         private void transport_MessageReceived(object sender, byte[] messageData)
@@ -141,13 +144,34 @@ namespace UGCS.DroneTracker.Core.PTZ
             _transport.SendMessage(message);
         }
 
+        public Func<double, double> GetPtzDeviceTiltCoordinatesImpl { get; set; }
+
+        private static double DefaultGetPtzDeviceTiltCoordinatesImpl(double angle)
+        {
+            return angle;
+        }
+
+        private static double HDS3051GetPtzDeviceTiltCoordinatesImpl(double angle)
+        {
+            if (angle <= 0)
+            {
+                return Math.Abs(angle);
+            }
+            else
+            {
+                return 360d - angle;
+            }
+        }
 
         public void TiltTo(byte address, double angle)
         {
             var settings = _settingsManager.GetAppSettings();
             var tiltAngleToCoordinatesFactor = settings.PTZTiltAngleToCoordinateFactor;
 
-            var message = _requestBuilder.SetTilt(address, (int)(angle * tiltAngleToCoordinatesFactor * 100d));
+            var ptzTiltCoordinates =
+                (GetPtzDeviceTiltCoordinatesImpl?.Invoke(angle) ?? 0) * tiltAngleToCoordinatesFactor;
+
+            var message = _requestBuilder.SetTilt(address, (int)(ptzTiltCoordinates * 100d));
             _logger.LogDebugMessage($"TiltTo {angle} * {tiltAngleToCoordinatesFactor} => {message}");
             _transport.SendMessage(message);
         }

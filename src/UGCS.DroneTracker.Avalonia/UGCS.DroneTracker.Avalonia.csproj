@@ -4,9 +4,9 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <RootNamespace>UGCS.DroneTracker.Avalonia</RootNamespace>
     <AssemblyName>DroneTracker-AV</AssemblyName>
-    <AssemblyVersion>1.0.2.0</AssemblyVersion>
-    <FileVersion>1.0.2.0</FileVersion>
-    <Version>1.0.2</Version>
+    <AssemblyVersion>1.0.3.0</AssemblyVersion>
+    <FileVersion>1.0.3.0</FileVersion>
+    <Version>1.0.3</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <NoWarn>1701;1702</NoWarn>
@@ -43,7 +43,7 @@
     <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Ninject" Version="3.3.4" />
-    <PackageReference Include="ugcs-dotnet-sdk" Version="3.6.193" />
+    <PackageReference Include="ugcs-dotnet-sdk" Version="4.2.3" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Views\SettingsView.xaml">

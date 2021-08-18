@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="ugcs-dotnet-sdk" Version="4.2.3" />
     <PackageReference Include="Unosquare.Swan" Version="3.0.0" />
   </ItemGroup>
 

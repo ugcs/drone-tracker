@@ -1,7 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
+﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
@@ -12,7 +9,6 @@ using ReactiveUI;
 using UGCS.DroneTracker.Avalonia.ViewModels;
 using UGCS.DroneTracker.Core.Settings;
 using UGCS.DroneTracker.Core.UGCS;
-using ugcs_at.UGCS;
 
 namespace UGCS.DroneTracker.Avalonia.Views
 {

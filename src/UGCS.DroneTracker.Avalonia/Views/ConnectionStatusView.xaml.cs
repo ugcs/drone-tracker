@@ -5,7 +5,6 @@ using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using UGCS.DroneTracker.Avalonia.ViewModels;
 using UGCS.DroneTracker.Core.UGCS;
-using ugcs_at.UGCS;
 
 namespace UGCS.DroneTracker.Avalonia.Views
 {

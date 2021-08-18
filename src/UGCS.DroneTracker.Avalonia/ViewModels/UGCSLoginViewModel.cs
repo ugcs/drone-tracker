@@ -9,7 +9,6 @@ using UGCS.DroneTracker.Core;
 using UGCS.DroneTracker.Core.Services;
 using UGCS.DroneTracker.Core.Settings;
 using UGCS.DroneTracker.Core.UGCS;
-using ugcs_at.UGCS;
 
 namespace UGCS.DroneTracker.Avalonia.ViewModels
 {

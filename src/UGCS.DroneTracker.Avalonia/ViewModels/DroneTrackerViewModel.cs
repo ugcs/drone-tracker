@@ -13,7 +13,6 @@ using UGCS.DroneTracker.Core.PTZ;
 using UGCS.DroneTracker.Core.Services;
 using UGCS.DroneTracker.Core.Settings;
 using UGCS.Sdk.Protocol.Encoding;
-using ugcs_at;
 
 // ReSharper disable ConvertClosureToMethodGroup
 
